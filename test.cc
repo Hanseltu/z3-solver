@@ -120,7 +120,7 @@ void bitvector_example(){
 
 std::map<std::string, unsigned long long> ret_map; //TODO is the unsigned long long ok here?
 
-std::map<std::string, unsigned long long> se_solver(Expr expr){
+std::map<std::string, unsigned long long> se_solver(ExprPtr expr){
     // 1. get symbolic variable name
     // 2. traverse the experssion, and build expr recongnized in z3
     std::map<std::string, unsigned long long> ret;
@@ -160,6 +160,7 @@ int main(){
     SgeExpr *sge = new SgeExpr(std::make_shared<SubExpr>(extptr, cons));
     std::cout << "### The constraints to be passed into solver : " << std::endl;
     sge->print();
+    std::cout << "\nKind Sge : " << sge->getKind() << std::endl;
     std::cout << "\n\n";
 
     // using solver

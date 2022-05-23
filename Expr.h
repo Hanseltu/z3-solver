@@ -47,6 +47,8 @@
 #define EXPR_Combine        42
 #define EXPR_Extract        43
 
+
+
 struct SYMemObject {
         std::string name;  // name of object
         unsigned long long addr;        // memory address
@@ -59,6 +61,62 @@ namespace EXPR {
 
 class Expr {
     protected:
+
+    // @THX: add the definition of different kinds of expression
+    public:
+    enum Kind {
+        // the IDs follow the #define ones
+        UNDEFINED = -1,
+
+        // why no Const, Bin, ,Tri, and Ury?
+        Const = 3,
+        Bin,
+        Tri,
+        Ury,
+
+        Add = 7,
+        Sub,
+        Mul,
+        UDiv,
+
+        SDiv, // 11
+        URem,
+        SRem,
+        Neg,
+        Not,
+        And,
+        Or,
+        Xor,
+        Shl,
+        LShr,
+
+        AShr, //21
+        Equal,
+        Distinct,
+        Ult,
+        Ule,
+        Ugt,
+        Uge,
+        Slt,
+        Sle,
+        Sgt,
+
+        Sge, //31
+        Lor,
+        LAnd,
+        LNot,
+        SignEXT,
+        ZeroEXT,
+        Shrd,
+        Sign,
+        NoSign,
+        Overflow,
+
+        NoOverflow, //41
+        Combine,
+        Extract
+
+    }; // end enum definition
 
     public:
         int exprID ;
@@ -80,6 +138,10 @@ class Expr {
 
         virtual void print(void) {};
         //virtual void print(void) = 0;
+        //
+        // @THX : add a function to get Kind
+        virtual Kind getKind() const = 0;
+
 };
 
 typedef std::shared_ptr<Expr> ExprPtr;
@@ -100,6 +162,9 @@ class UDefExpr : public Expr {
     }
 
     void print ();
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return UNDEFINED;}
 };
 
 class ConstExpr : public Expr {
@@ -112,6 +177,9 @@ class ConstExpr : public Expr {
     }
 
     void print () ;
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Const;}
 };
 
 class BinExpr : public Expr {
@@ -123,18 +191,27 @@ class BinExpr : public Expr {
 
    public:
     void print () ;
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Bin;}
 };
 
 class AddExpr : public BinExpr {
    public:
     AddExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Add;}
     AddExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Add;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Add;}
 };
 
 class SubExpr : public BinExpr {
    public:
     SubExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Sub;}
     SubExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Sub;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Sub;}
 };
 
 class MulExpr : public BinExpr {
@@ -142,47 +219,71 @@ class MulExpr : public BinExpr {
    // sz is source size.
     MulExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Mul;}
     MulExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Mul;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Mul;}
 };
 
 class DivExpr : public BinExpr {
    public:
     DivExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_UDiv;}
     DivExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_UDiv;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return UDiv;}
 };
 
 class AndExpr : public BinExpr {
    public:
     AndExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_And;}
     AndExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_And;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return And;}
 };
 
 class OrExpr : public BinExpr {
    public:
     OrExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Or;}
     OrExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Or;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Or;}
 };
 
 class XorExpr : public BinExpr {
    public:
     XorExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Xor;}
     XorExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Xor;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Xor;}
 };
 
 class Shl_SalExpr : public BinExpr {
    public:
     Shl_SalExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Shl;}
     Shl_SalExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Shl;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Shl;}
 };
 class ShrExpr : public BinExpr {
    public:
     ShrExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_LShr;}
     ShrExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_LShr;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return LShr;}
 };
 
 class SarExpr : public BinExpr {
    public:
     SarExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_AShr;}
     SarExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_AShr;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return AShr;}
 };
 
 class iDivExpr : public BinExpr {
@@ -190,12 +291,18 @@ class iDivExpr : public BinExpr {
     // r : Dividend, l : Divisor
     iDivExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_SDiv;}
     iDivExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_SDiv;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return SDiv;}
 };
 
 class iRemExpr : public BinExpr {
    public:
     iRemExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_SRem;}
     iRemExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_SRem;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return SRem;}
 };
 
 class UryExpr : public Expr {
@@ -207,118 +314,178 @@ class UryExpr : public Expr {
    public:
     virtual void print () ;
 
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Ury;}
+
 };
 
 class NegExpr : public UryExpr {
    public:
     NegExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Neg;}
     NegExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Neg;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Neg;}
 };
 
 class NotExpr : public UryExpr {
    public:
     NotExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Not;}
     NotExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Not;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Not;}
 };
 
 class LNotExpr : public UryExpr {
    public:
     LNotExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_LNot;}
     LNotExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_LNot;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return LNot;}
 };
 
 class SignExtExpr : public UryExpr {
    public:
     SignExtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_SignEXT;}
     SignExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_SignEXT;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Sign;}
 };
 
 class ZeroExtExpr : public UryExpr {
    public:
     ZeroExtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_ZeroEXT;}
     ZeroExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_ZeroEXT;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return ZeroEXT;}
 };
 
 class EqualExpr : public UryExpr {
     public:
         EqualExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Equal;}
         EqualExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Equal;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Equal;}
 };
 
 class DistinctExpr : public UryExpr {
     public:
         DistinctExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Distinct;}
         DistinctExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Distinct;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Distinct;}
 };
 
 class UltExpr : public UryExpr {
     public:
         UltExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Ult;}
         UltExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Ult;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Ult;}
 };
 
 class UleExpr : public UryExpr {
     public:
         UleExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Ule;}
         UleExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Ule;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Ule;}
 };
 
 class UgtExpr : public UryExpr {
     public:
         UgtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Ugt;}
         UgtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Ugt;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Ugt;}
 };
 
 class UgeExpr : public UryExpr {
     public:
         UgeExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Uge;}
         UgeExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Uge;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Uge;}
 };
 
 class SltExpr : public UryExpr {
     public:
         SltExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Slt;}
         SltExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Slt;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Slt;}
 };
 
 class SleExpr : public UryExpr {
     public:
         SleExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sle;}
         SleExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sle;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Sle;}
 };
 
 class SgtExpr : public UryExpr {
     public:
         SgtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sgt;}
         SgtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sgt;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Sgt;}
 } ;
 
 class SgeExpr : public UryExpr {
     public:
         SgeExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sge;}
         SgeExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sge;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Sge;}
 } ;
 
 class SignExpr : public UryExpr {
     public:
         SignExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sign;}
         SignExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sign;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Sign;}
 } ;
 
 class NoSignExpr : public UryExpr {
     public:
         NoSignExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_NoSign;}
         NoSignExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_NoSign;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return NoSign;}
 } ;
 class OverflowExpr : public UryExpr {
     public:
         OverflowExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Overflow;}
         OverflowExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Overflow;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Overflow;}
 } ;
 class NoOverflowExpr : public UryExpr {
     public:
         NoOverflowExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_NoOverflow;}
         NoOverflowExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_NoOverflow;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return NoOverflow;}
 } ;
 
 class TriExpr : public Expr {
@@ -329,12 +496,18 @@ class TriExpr : public Expr {
     TriExpr(ExprPtr r, ExprPtr m, ExprPtr l, int sz, int off) : Expr(sz, off), R(r), M(m), L(l) {}
 
     void print () ;
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Tri;}
 };
 
 class ShrdExpr :public TriExpr {
     public:
     ShrdExpr(ExprPtr r, ExprPtr m, ExprPtr l) :TriExpr(r, m, l) {exprID = EXPR_Shrd;}
     ShrdExpr(ExprPtr r, ExprPtr m, ExprPtr l, int sz, int off) : TriExpr(r, m, l, sz, off) {exprID = EXPR_Shrd;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Shrd;}
 };
 
 class CombineExpr :public BinExpr {
@@ -343,6 +516,9 @@ class CombineExpr :public BinExpr {
     // r is high bytes, l is low bytes.
     CombineExpr(ExprPtr r, ExprPtr l, int rsize, int lsize) :BinExpr(r, l) {exprID = EXPR_Combine;rsz=rsize; lsz=lsize;}
     CombineExpr(ExprPtr r, ExprPtr l, int rsize, int lsize, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Combine;rsz=rsize; lsz=lsize;}
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Combine;}
 };
 class ExtractExpr : public UryExpr {
     public:
@@ -351,6 +527,9 @@ class ExtractExpr : public UryExpr {
         ExtractExpr(ExprPtr expr, int start, int end, int sz, int off) : UryExpr(expr, sz, off) {exprID = EXPR_Extract;s=start; e=end;}
 
         virtual void print () ;
+
+    // @THX add the implemenation of the virtual function
+    Kind getKind() const { return Extract;}
 } ;
 
 };  // namespace EXPR
