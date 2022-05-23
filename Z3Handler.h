@@ -11,14 +11,21 @@
 #include"z3++.h"
 #include "Expr.h"
 
+extern z3::context g_z3_context;
+using namespace EXPR;
 // using namespace z3;
+namespace Z3HANDLER {
 class Z3Handler{
+protected:
+    z3::context& context_;
 public:
-    Z3Handler(){}
-    virtual ~Z3Handler(){}
+    //z3::expr x = c.int_val(0);
+
+    Z3Handler();
+    virtual ~Z3Handler();
 
     // handle different expressions
-    z3::expr Z3HandleUND();
+    z3::expr Z3HandleUND(ExprPtr undefined_expr);
 
     z3::expr Z3HandleConst(); // 3
     z3::expr Z3HandleBin();
@@ -68,6 +75,6 @@ public:
     z3::expr Z3HandleExtract();
 
 };
-
+} // end of namespace
 
 #endif  // end of _Z3HANDLER_H__

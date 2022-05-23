@@ -2,7 +2,7 @@
 #include"z3++.h"
 
 #include "Expr.h"
-
+#include "Z3Handler.h"
 
 #include <map>
 
@@ -138,8 +138,11 @@ std::map<std::string, unsigned long long> se_solver(ExprPtr expr){
     return ret;
 
 }
+using namespace Z3HANDLER;
 
 
+z3::context g_z3_context;
+z3::solver g_solver(g_z3_context);
 int main(){
     //demorgan();
     //find_model_example1();
@@ -149,7 +152,25 @@ int main(){
     SYMemObject *obj = new SYMemObject;
     obj->name = "niceval";
     UDefExpr sym = new UDefExpr(obj);
+    // Z3HandleUND(sym)
+    Z3Handler *z3_handler = new Z3Handler();
+    expr ret_add =  z3_handler->Z3HandleAdd();
+    expr x = g_z3_context.int_const("x");
+    expr b = g_z3_context.bool_const("b");
+    expr con = x == ret_add;
+    g_solver.add(con);
+    // traversing the model
+    std::cout << "g_solver : " << g_solver.check() << g_solver << std::endl;
+    std::cout << "### solver results: " << "\n";
+    model m = g_solver.get_model();
+    for (unsigned i = 0; i < m.size(); i++) {
+        func_decl v = m[i];
+        // this problem contains only constants
+        assert(v.arity() == 0);
+        std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+    }
     //Expr *exprptr = new Expr(8, 0);
+    /*
     ExprPtr sptr = std::make_shared<UDefExpr>(obj);
     ExtractExpr *ext = new ExtractExpr(sptr, 0, 4);
     //ext->print();
@@ -184,5 +205,6 @@ int main(){
         assert(v.arity() == 0);
         std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
     }
+    */
     return 0;
 }

@@ -1,6 +1,11 @@
 #include "Z3Handler.h"
 
 using namespace z3;
+using namespace Z3HANDLER;
+
+Z3Handler::Z3Handler(): context_(g_z3_context){}
+
+Z3Handler::~Z3Handler(){}
 
 
 z3::expr Z3HandleUND(){
@@ -33,15 +38,15 @@ z3::expr Z3HandleUry(){
     return x;
 }
 
-z3::expr Z3HandleAdd(){ // 7
-    context c;
-    expr x = c.bv_const("x", 100);
+z3::expr Z3Handler::Z3HandleAdd(){ // 7
+    //context c;
+    expr x = context_.int_val(999);
     return x;
 }
 
 z3::expr Z3HandleSub(){
-    context c;
-    expr x = c.bv_const("x", 100);
+    static context c;
+    static expr x = c.bv_const("x", 100);
     return x;
 }
 
