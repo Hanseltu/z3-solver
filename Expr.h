@@ -196,6 +196,8 @@ class BinExpr : public Expr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Bin; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class AddExpr : public BinExpr {
@@ -205,6 +207,8 @@ class AddExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Add; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class SubExpr : public BinExpr {
@@ -214,6 +218,8 @@ class SubExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sub; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class MulExpr : public BinExpr {
@@ -224,6 +230,8 @@ class MulExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Mul; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class DivExpr : public BinExpr {
@@ -233,6 +241,8 @@ class DivExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return UDiv; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class AndExpr : public BinExpr {
@@ -242,6 +252,8 @@ class AndExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return And; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class OrExpr : public BinExpr {
@@ -251,6 +263,8 @@ class OrExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Or; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class XorExpr : public BinExpr {
@@ -260,6 +274,8 @@ class XorExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Xor; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class Shl_SalExpr : public BinExpr {
@@ -269,6 +285,8 @@ class Shl_SalExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Shl; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 class ShrExpr : public BinExpr {
    public:
@@ -277,6 +295,8 @@ class ShrExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return LShr; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class SarExpr : public BinExpr {
@@ -286,6 +306,8 @@ class SarExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return AShr; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class iDivExpr : public BinExpr {
@@ -296,6 +318,8 @@ class iDivExpr : public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return SDiv; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class iRemExpr : public BinExpr {
@@ -461,6 +485,7 @@ class SgtExpr : public UryExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sgt; }
+    ExprPtr getExprPtr() { return E; }
 } ;
 
 class SgeExpr : public UryExpr {
@@ -480,6 +505,7 @@ class SignExpr : public UryExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sign; }
+    ExprPtr getExprPtr() { return E; }
 } ;
 
 class NoSignExpr : public UryExpr {
@@ -521,6 +547,9 @@ class TriExpr : public Expr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Tri; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrM() { return M; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class ShrdExpr :public TriExpr {
@@ -530,6 +559,9 @@ class ShrdExpr :public TriExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Shrd; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrM() { return M; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
 class CombineExpr :public BinExpr {
@@ -541,6 +573,8 @@ class CombineExpr :public BinExpr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Combine; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 class ExtractExpr : public UryExpr {
     public:

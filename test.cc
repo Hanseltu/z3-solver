@@ -167,12 +167,19 @@ void test(){
     std::cout << "ret_const : " << ret_const << std::endl;
 
     //testing Add
+    ExprPtr add_expr = std::make_shared<AddExpr>(const_expr, udef_expr);
     expr ret_add =  z3_handler->Z3HandleAdd(const_expr, udef_expr);
     std::cout << "ret_add : " << ret_add << std::endl;
     //expr con = ret_udef == ret_add;
 
     //testing Sge
-    ExprPtr sge_expr = std::make_shared<SgeExpr>(udef_expr);
+    ExprPtr sge_expr = std::make_shared<SgeExpr>(add_expr);
+    SgeExpr * sge = static_cast<SgeExpr*>(sge_expr.get());
+
+    std::cout << "+++ Original Expression: " ;
+    sge->print();
+    std::cout << "\n";
+
     expr ret_sge = z3_handler->Z3HandleSge(sge_expr);
     g_solver.add(ret_sge);
 
