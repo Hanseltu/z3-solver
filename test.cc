@@ -138,27 +138,56 @@ std::map<std::string, unsigned long long> se_solver(ExprPtr expr){
     return ret;
 
 }
+
 using namespace Z3HANDLER;
 
 
 z3::context g_z3_context;
 z3::solver g_solver(g_z3_context);
+
+
+void test(){
+    // create a symbolic object
+    SYMemObject *obj = new SYMemObject;
+    obj->name = "niceval";
+    obj->size = 8;
+    UDefExpr *sym_expr = new UDefExpr(obj);
+    // Z3HandleUND(sym)
+    Z3Handler *z3_handler = new Z3Handler();
+
+
+    // testing UDefExpr
+    ExprPtr udef_expr = std::make_shared<UDefExpr>(obj);
+    expr ret_udef = z3_handler->Z3HandleUND(udef_expr);
+    std::cout << "ret_udef : " << ret_udef << std::endl;
+
+    //testing Const
+    ExprPtr const_expr = std::make_shared<ConstExpr>(0x64);
+    expr ret_const = z3_handler->Z3HandleConst(const_expr);
+    std::cout << "ret_const : " << ret_const << std::endl;
+
+    //testing Add
+    expr ret_add =  z3_handler->Z3HandleAdd(const_expr, udef_expr);
+    std::cout << "ret_add : " << ret_add << std::endl;
+    //expr con = ret_udef == ret_add;
+
+    //testing Sge
+    ExprPtr sge_expr = std::make_shared<SgeExpr>(udef_expr);
+    expr ret_sge = z3_handler->Z3HandleSge(sge_expr);
+    g_solver.add(ret_sge);
+
+    // testing handlingExprPtr
+    expr ret_expr_ptr = z3_handler->Z3HandlingExprPtr(udef_expr);
+    delete obj;
+}
+
 int main(){
     //demorgan();
     //find_model_example1();
     //bitvector_example1();
     //bitvector_example2();
     //bitvector_example();
-    SYMemObject *obj = new SYMemObject;
-    obj->name = "niceval";
-    UDefExpr sym = new UDefExpr(obj);
-    // Z3HandleUND(sym)
-    Z3Handler *z3_handler = new Z3Handler();
-    expr ret_add =  z3_handler->Z3HandleAdd();
-    expr x = g_z3_context.int_const("x");
-    expr b = g_z3_context.bool_const("b");
-    expr con = x == ret_add;
-    g_solver.add(con);
+    test();
     // traversing the model
     std::cout << "g_solver : " << g_solver.check() << g_solver << std::endl;
     std::cout << "### solver results: " << "\n";

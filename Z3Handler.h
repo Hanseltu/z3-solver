@@ -24,15 +24,17 @@ public:
     Z3Handler();
     virtual ~Z3Handler();
 
-    // handle different expressions
-    z3::expr Z3HandleUND(ExprPtr undefined_expr);
+    z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
-    z3::expr Z3HandleConst(); // 3
+    // handle different expressions
+    z3::expr Z3HandleUND(ExprPtr undef_expr);
+
+    z3::expr Z3HandleConst(ExprPtr const_expr); // 3
     z3::expr Z3HandleBin();
     z3::expr Z3HandleTri();
     z3::expr Z3HandleUry();
 
-    z3::expr Z3HandleAdd(); // 7
+    z3::expr Z3HandleAdd(ExprPtr r, ExprPtr l); // 7
     z3::expr Z3HandleSub();
     z3::expr Z3HandleMul();
     z3::expr Z3HandleUDiv();
@@ -59,7 +61,7 @@ public:
     z3::expr Z3HandleSle();
     z3::expr Z3HandleSgt();
 
-    z3::expr Z3HandleSge(); // 31
+    z3::expr Z3HandleSge(ExprPtr ptr); // 31
     z3::expr Z3HandleLor();
     z3::expr Z3HandleLAnd();
     z3::expr Z3HandleLNot();
