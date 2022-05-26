@@ -1,2 +1,2 @@
 # z3-solver
-constraint solver for kerner SE
+constraint solver for kernel SE
