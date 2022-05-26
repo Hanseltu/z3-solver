@@ -180,8 +180,10 @@ void test(){
     sge->print();
     std::cout << "\n";
 
-    expr ret_sge = z3_handler->Z3HandleSge(sge_expr);
-    g_solver.add(ret_sge);
+    //expr ret_sge = z3_handler->Z3HandleSge(sge_expr);
+    //expr ret_sge = z3_handler->Z3HandlingExprPtr(sge_expr);
+    z3_handler->Z3SolveOne(sge_expr);
+    //g_solver.add(ret_sge);
 
     // testing handlingExprPtr
     expr ret_expr_ptr = z3_handler->Z3HandlingExprPtr(udef_expr);
@@ -195,6 +197,7 @@ int main(){
     //bitvector_example2();
     //bitvector_example();
     test();
+    /*
     // traversing the model
     std::cout << "g_solver : " << g_solver.check() << g_solver << std::endl;
     std::cout << "### solver results: " << "\n";
@@ -206,7 +209,6 @@ int main(){
         std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
     }
     //Expr *exprptr = new Expr(8, 0);
-    /*
     ExprPtr sptr = std::make_shared<UDefExpr>(obj);
     ExtractExpr *ext = new ExtractExpr(sptr, 0, 4);
     //ext->print();

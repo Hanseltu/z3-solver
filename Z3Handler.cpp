@@ -17,9 +17,30 @@ void perror(char *const msg){ //TODO
 
 using namespace z3;
 using namespace Z3HANDLER;
+
+extern z3::solver g_solver;
+
 Z3Handler::Z3Handler(): context_(g_z3_context){}
 
 Z3Handler::~Z3Handler(){}
+
+// TODO not work for now
+std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(ExprPtr ptr){
+    std::map<std::string, unsigned long long> ret;
+    expr constraints = Z3HandlingExprPtr(ptr);
+    //solver Solver(context_);
+    //Solver.add(constraints);
+    g_solver.add(constraints);
+    std::cout << "Solver: " << g_solver << std::endl;
+    model m = g_solver.get_model();
+    for (unsigned i = 0; i < m.size(); i++) {
+        func_decl v = m[i];
+        // this problem contains only constants
+        assert(v.arity() == 0);
+        std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+    }
+    return ret;
+}
 
 z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
     int kind = ptr->getKind();
@@ -33,13 +54,16 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return Z3HandleConst(ptr);
         }
         case Expr::Kind::Bin:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Tri:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Ury:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Add: { // 7
             AddExpr * expr_r = static_cast<AddExpr*>(ptr.get());
@@ -48,115 +72,156 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return Z3HandleAdd(R, L);
         }
         case Expr::Kind::Sub:{
-            ;
+            SubExpr * expr_r = static_cast<SubExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleSub(R, L);
         }
         case Expr::Kind::Mul:{
-            ;
+            MulExpr * expr_r = static_cast<MulExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleMul(R, L);
         }
         case Expr::Kind::UDiv:{
-            ;
+            DivExpr * expr_r = static_cast<DivExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleUDiv(R, L);
         }
         case Expr::Kind::SDiv:{ // 11
-            ;
+            iDivExpr * expr_r = static_cast<iDivExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleSDiv(R, L);
         }
         case Expr::Kind::URem:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::SRem:{
-            ;
+            iRemExpr * expr_r = static_cast<iRemExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleSRem(R, L);
         }
         case Expr::Kind::Neg:{
-            ;
+            return Z3HandleNeg(ptr);
         }
         case Expr::Kind::Not:{
-            ;
+            return Z3HandleNot(ptr);
         }
         case Expr::Kind::And:{
-            ;
+            AndExpr * expr_r = static_cast<AndExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleAnd(R, L);
         }
         case Expr::Kind::Or:{
-            ;
+            OrExpr * expr_r = static_cast<OrExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleOr(R, L);
         }
         case Expr::Kind::Xor:{
-            ;
+            XorExpr * expr_r = static_cast<XorExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleXor(R, L);
         }
         case Expr::Kind::Shl:{
-            ;
+            Shl_SalExpr * expr_r = static_cast<Shl_SalExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleShl(R, L);
         }
         case Expr::Kind::LShr:{
-            ;
+            ShrExpr * expr_r = static_cast<ShrExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleLShr(R, L);
         }
         case Expr::Kind::AShr:{ // 21
-            ;
+            SarExpr * expr_r = static_cast<SarExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleAShr(R, L);
         }
         case Expr::Kind::Equal:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Distinct:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Ult:{
-            ;
+            return Z3HandleUlt(ptr);
         }
         case Expr::Kind::Ule:{
-            ;
+            return Z3HandleUle(ptr);
         }
         case Expr::Kind::Ugt:{
-            ;
+            return Z3HandleUgt(ptr);
         }
         case Expr::Kind::Uge:{
-            ;
+            return Z3HandleUge(ptr);
         }
         case Expr::Kind::Slt:{
-            ;
+            return Z3HandleSlt(ptr);
         }
         case Expr::Kind::Sle:{
-            ;
+            return Z3HandleSle(ptr);
         }
         case Expr::Kind::Sgt:{
-            ;
+            return Z3HandleSgt(ptr);
         }
         case Expr::Kind::Sge:{ // 31
             return Z3HandleSge(ptr);
         }
         case Expr::Kind::Lor:{
-            ;
-        }
-        case Expr::Kind::LAnd:{
-            ;
-        }
-        case Expr::Kind::LNot:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::SignEXT:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::ZeroEXT:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Shrd:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Sign:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::NoSign:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Overflow:{
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::NoOverflow:{ // 41
-            ;
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
         }
         case Expr::Kind::Combine:{
-            ;
+            CombineExpr * expr_r = static_cast<CombineExpr*>(ptr.get());
+            ExprPtr R = expr_r->getExprPtrR();
+            ExprPtr L = expr_r->getExprPtrL();
+            return Z3HandleCombine(R, L);
         }
         case Expr::Kind::Extract:{
-            ;
+            return Z3HandleExtract(ptr);
         }
         default:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? No such type! \033[0m\n");
             throw ptr;
         }
     }
@@ -238,7 +303,12 @@ z3::expr Z3Handler::Z3HandleSRem(ExprPtr r, ExprPtr l){
 }
 
 z3::expr Z3Handler::Z3HandleNeg(ExprPtr ptr){
-    expr x = Z3HandlingExprPtr(ptr);
+    NegExpr *neg_expr = static_cast<NegExpr*>(ptr.get());
+    if (neg_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : NegExpr \033[0m\n");
+        throw neg_expr;
+    }
+    expr x = Z3HandlingExprPtr(neg_expr->getExprPtr());
     expr ret = (- x);
     return ret;
 }
@@ -436,7 +506,7 @@ z3::expr Z3Handler::Z3HandleCombine(ExprPtr r, ExprPtr l){ // Is the same as Con
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr, int start, int end){
+z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     ExtractExpr *extract_expr = static_cast<ExtractExpr*>(ptr.get());
     if (extract_expr == NULL){
         printf("\033[47;31m Z3 Handlering ERROR : LNotExpr \033[0m\n");

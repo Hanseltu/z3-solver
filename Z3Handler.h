@@ -10,7 +10,7 @@
 
 #include"z3++.h"
 #include "Expr.h"
-
+#include <map>
 extern z3::context g_z3_context;
 using namespace EXPR;
 // using namespace z3;
@@ -23,6 +23,9 @@ public:
 
     Z3Handler();
     virtual ~Z3Handler();
+
+    // solver function
+    std::map<std::string, unsigned long long> Z3SolveOne(ExprPtr ptr);
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
@@ -74,7 +77,7 @@ public:
 
     z3::expr Z3HandleNoOverflow(ExprPtr nooverflow_expr); // 41
     z3::expr Z3HandleCombine(ExprPtr r, ExprPtr l);  // ?lsize? rsize?
-    z3::expr Z3HandleExtract(ExprPtr ptr, int start, int end); // need to return size as well
+    z3::expr Z3HandleExtract(ExprPtr ptr); // need to return size as well
 
 };
 } // end of namespace
