@@ -587,6 +587,8 @@ class ExtractExpr : public UryExpr {
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Extract; }
     ExprPtr getExprPtr() {return E; }
+    int getStart(){ return s; }
+    int getEnd(){ return e; }
 } ;
 
 };  // namespace EXPR

@@ -228,101 +228,115 @@ z3::expr Z3Handler::Z3HandleSDiv(ExprPtr r, ExprPtr l){ // 11
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleURem(){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleURem(){ // not defined in Expr.h
+    expr x = context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleSRem(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleSRem(ExprPtr r, ExprPtr l){
+    expr ret = z3::srem(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleNeg(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr x = Z3HandlingExprPtr(ptr);
+    expr ret = (- x);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleNot(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    NotExpr *not_expr = static_cast<NotExpr*>(ptr.get());
+    if (not_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : NotExpr \033[0m\n");
+        throw not_expr;
+    }
+    expr x = Z3HandlingExprPtr(not_expr->getExprPtr());
+    expr ret = (~ x);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleAnd(ExprPtr r, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr ret = Z3HandlingExprPtr(l) & Z3HandlingExprPtr(r);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleOr(ExprPtr r, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr ret = Z3HandlingExprPtr(l) | Z3HandlingExprPtr(r);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleXor(ExprPtr r, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr ret = Z3HandlingExprPtr(l) ^ Z3HandlingExprPtr(r);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleShl(ExprPtr r, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr ret = z3::shl(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleLShr(ExprPtr r, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr ret = z3::lshr(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleAShr(ExprPtr r, ExprPtr l){ // 21
-
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    expr ret = z3::ashr(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    return ret;
 }
 
-z3::expr Z3Handler::Z3HandleEqual(ExprPtr ptr){
-
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleEqual(ExprPtr ptr){ //  Should have two sub-expressions?
+    return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleDistinct(ExprPtr ptr){
-    expr x = context_.bv_val(100, 64);
-    return x;
+z3::expr Z3Handler::Z3HandleDistinct(ExprPtr ptr){ // Should have two sub-expressions?
+    return context_.bv_val(100, 64);
 }
 
+
+// for Ult, Ule, Ugt, Uge, Slt, Sle, Sge, Sge, are they only compare with 0? rather than two sub-expressions?
+// If this is the case, is it 0 always in the right side? e.g., x >0 not 0 > x?
 z3::expr Z3Handler::Z3HandleUlt(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    UltExpr *ult_expr = static_cast<UltExpr*>(ptr.get());
+    if (ult_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : UltExpr \033[0m\n");
+        throw ult_expr;
+    }
+    expr x = Z3HandlingExprPtr(ult_expr->getExprPtr());
+    expr ret = z3::ult(x, 0);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleUle(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    UleExpr *ule_expr = static_cast<UleExpr*>(ptr.get());
+    if (ule_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : UleExpr \033[0m\n");
+        throw ule_expr;
+    }
+    expr x = Z3HandlingExprPtr(ule_expr->getExprPtr());
+    expr ret = z3::ule(x, 0);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleUgt(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    UgtExpr *ugt_expr = static_cast<UgtExpr*>(ptr.get());
+    if (ugt_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : UleExpr \033[0m\n");
+        throw ugt_expr;
+    }
+    expr x = Z3HandlingExprPtr(ugt_expr->getExprPtr());
+    expr ret = z3::ugt(x, 0);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleUge(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+    UgeExpr *uge_expr = static_cast<UgeExpr*>(ptr.get());
+    if (uge_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : UleExpr \033[0m\n");
+        throw uge_expr;
+    }
+    expr x = Z3HandlingExprPtr(uge_expr->getExprPtr());
+    expr ret = z3::uge(x, 0);
+    return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSlt(ExprPtr ptr){
@@ -389,52 +403,47 @@ z3::expr Z3Handler::Z3HandleLNot(ExprPtr ptr){
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){
+z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){ // not sure how to write z3 expr
     return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){
+z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){ // not sure how to write z3 expr
     return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l){  // not sure how to write z3 expr
+    return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleSign(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleSign(ExprPtr ptr){ // not sure how to write z3 expr
+    return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleNoSign(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleNoSign(ExprPtr ptr){ // not sure how to write z3 expr
+    return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleOverflow(ExprPtr ptr){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleOverflow(ExprPtr ptr){ // not sure how to write z3 expr
+    return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleNoOverflow(ExprPtr ptr){ // 41
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleNoOverflow(ExprPtr ptr){ // 41 // not sure how to write z3 expr
+    return context_.bv_val(100, 64);
 }
 
-z3::expr Z3Handler::Z3HandleCombine(ExprPtr r, ExprPtr l){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleCombine(ExprPtr r, ExprPtr l){ // Is the same as Concat? This version does not consider the lsize and rsize
+    expr ret = z3::concat(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    return ret;
 }
 
-z3::expr Z3Handler::Z3HandleExtract(ExprPtr r, ExprPtr l, int size){
-    context c;
-    expr x = c.bv_const("x", 100);
-    return x;
+z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr, int start, int end){
+    ExtractExpr *extract_expr = static_cast<ExtractExpr*>(ptr.get());
+    if (extract_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : LNotExpr \033[0m\n");
+        throw extract_expr;
+    }
+    expr x = Z3HandlingExprPtr(extract_expr->getExprPtr());
+    int s = extract_expr->getStart();
+    int e = extract_expr->getEnd();
+    return x.extract(e, s); // looks different with the existing implementation
 }

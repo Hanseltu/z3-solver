@@ -41,7 +41,7 @@ public:
 
     z3::expr Z3HandleSDiv(ExprPtr r, ExprPtr l); // 11
     z3::expr Z3HandleURem(); // not defined?
-    z3::expr Z3HandleSRem(ExprPtr srem_expr);
+    z3::expr Z3HandleSRem(ExprPtr r, ExprPtr l);
     z3::expr Z3HandleNeg(ExprPtr neg_expr);
     z3::expr Z3HandleNot(ExprPtr not_expr);
     z3::expr Z3HandleAnd(ExprPtr r, ExprPtr l);
@@ -74,7 +74,7 @@ public:
 
     z3::expr Z3HandleNoOverflow(ExprPtr nooverflow_expr); // 41
     z3::expr Z3HandleCombine(ExprPtr r, ExprPtr l);  // ?lsize? rsize?
-    z3::expr Z3HandleExtract(ExprPtr r, ExprPtr l, int size); // need to return size as well
+    z3::expr Z3HandleExtract(ExprPtr ptr, int start, int end); // need to return size as well
 
 };
 } // end of namespace
