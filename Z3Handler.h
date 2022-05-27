@@ -33,9 +33,9 @@ public:
     z3::expr Z3HandleUND(ExprPtr undef_expr);
 
     z3::expr Z3HandleConst(ExprPtr const_expr); // 3
-    z3::expr Z3HandleBin(ExprPtr r, ExprPtr l);
-    z3::expr Z3HandleTri(ExprPtr r, ExprPtr m, ExprPtr l);
-    z3::expr Z3HandleUry(ExprPtr ury_expr);
+    z3::expr Z3HandleBin(ExprPtr r, ExprPtr l); // not sure how to write z3 expr
+    z3::expr Z3HandleTri(ExprPtr r, ExprPtr m, ExprPtr l); // not sure how to write z3 expr
+    z3::expr Z3HandleUry(ExprPtr ury_expr); // not sure how to write z3 expr
 
     z3::expr Z3HandleAdd(ExprPtr r, ExprPtr l); // 7
     z3::expr Z3HandleSub(ExprPtr r, ExprPtr l);
@@ -43,7 +43,7 @@ public:
     z3::expr Z3HandleUDiv(ExprPtr r, ExprPtr l);
 
     z3::expr Z3HandleSDiv(ExprPtr r, ExprPtr l); // 11
-    z3::expr Z3HandleURem(); // not defined?
+    z3::expr Z3HandleURem(); // not defined in Exph.h
     z3::expr Z3HandleSRem(ExprPtr r, ExprPtr l);
     z3::expr Z3HandleNeg(ExprPtr neg_expr);
     z3::expr Z3HandleNot(ExprPtr not_expr);
@@ -54,9 +54,9 @@ public:
     z3::expr Z3HandleLShr(ExprPtr r, ExprPtr l);
 
     z3::expr Z3HandleAShr(ExprPtr r, ExprPtr l); // 21
-    z3::expr Z3HandleEqual(ExprPtr equal_expr);
-    z3::expr Z3HandleDistinct(ExprPtr dist_expr);
-    z3::expr Z3HandleUlt(ExprPtr ult_expr);
+    z3::expr Z3HandleEqual(ExprPtr equal_expr); // should have two sub-expressions?
+    z3::expr Z3HandleDistinct(ExprPtr dist_expr); // should have two sub-expressions?
+    z3::expr Z3HandleUlt(ExprPtr ult_expr); // the following comparison only compare with 0?
     z3::expr Z3HandleUle(ExprPtr ule_expr);
     z3::expr Z3HandleUgt(ExprPtr ugt_expr);
     z3::expr Z3HandleUge(ExprPtr uge_expr);
@@ -65,17 +65,17 @@ public:
     z3::expr Z3HandleSgt(ExprPtr sgt_expr);
 
     z3::expr Z3HandleSge(ExprPtr sge_expr); // 31
-    z3::expr Z3HandleLor(ExprPtr lor_expr);
-    z3::expr Z3HandleLAnd(ExprPtr land_expr);
+    z3::expr Z3HandleLor(ExprPtr lor_expr); // not defined in Expr.h
+    z3::expr Z3HandleLAnd(ExprPtr land_expr); // not defined in Expr.h
     z3::expr Z3HandleLNot(ExprPtr lnot_expr);
-    z3::expr Z3HandleSignExt(ExprPtr signext_expr);
-    z3::expr Z3HandleZeroEXT(ExprPtr zero_expr);
-    z3::expr Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l);
-    z3::expr Z3HandleSign(ExprPtr sign_expr);
-    z3::expr Z3HandleNoSign(ExprPtr nosign_expr);
-    z3::expr Z3HandleOverflow(ExprPtr overflow_expr);
+    z3::expr Z3HandleSignExt(ExprPtr signext_expr); // different from existing implementation
+    z3::expr Z3HandleZeroEXT(ExprPtr zero_expr); // different from existing implmentation
+    z3::expr Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l); // not sure how to write z3 expr
+    z3::expr Z3HandleSign(ExprPtr sign_expr); // not sure how to write z3 expr
+    z3::expr Z3HandleNoSign(ExprPtr nosign_expr); // not sure how to write z3 expr
+    z3::expr Z3HandleOverflow(ExprPtr overflow_expr); // not sure how to write z3 expr
 
-    z3::expr Z3HandleNoOverflow(ExprPtr nooverflow_expr); // 41
+    z3::expr Z3HandleNoOverflow(ExprPtr nooverflow_expr); // 41 // not sure how to write z3 expr
     z3::expr Z3HandleCombine(ExprPtr r, ExprPtr l);  // ?lsize? rsize?
     z3::expr Z3HandleExtract(ExprPtr ptr); // need to return size as well
 
