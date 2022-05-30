@@ -14,6 +14,7 @@ z3::solver g_solver(g_z3_context);
 void test(){
     // create a symbolic object
     SYMemObject *obj = new SYMemObject;
+    SYMemObject *obj1 = new SYMemObject;
     obj->name = "niceval";
     obj->size = 8;
     UDefExpr *sym_expr = new UDefExpr(obj);
@@ -85,6 +86,10 @@ void test(){
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << "   value : " << it->second << std::endl;
     }
+
+    // testing concritize function
+    bool ret_con = z3_handler_test->Z3SolveConcritize(obj, 1, ret_solver);
+    std::cout << "result of concritize : " << ret_con << std::endl;
 }
 
 

@@ -24,8 +24,13 @@ public:
     Z3Handler();
     virtual ~Z3Handler();
 
+    // a set to store symbolic objects
+    std::map<SYMemObject*, z3::expr> symObjectsMap;
     // solver function
     std::map<std::string, unsigned long long> Z3SolveOne(z3::model m); // better to use ExprPtr as input?
+
+    // concritize function
+    bool Z3SolveConcritize(SYMemObject*, unsigned int value,  z3::expr);
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 

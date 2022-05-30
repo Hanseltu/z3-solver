@@ -18,6 +18,9 @@ ret_extract length : (_ BitVec 32)
 +++ Original Expression: 
 Equal(And(Extract(Combine(0,niceval), 0, 4),Extract(Combine(0,niceval), 0, 4)))
 symbol : niceval   value : 0
+checking sat/unsat before concritization: sat
+checking sat/unsat after concritization: unsat
+result of concritize : 0
 ```
 
 ## Start merging
@@ -64,6 +67,10 @@ ret_result = z3_handler_test->Z3SolveOne(m); // now the [symbolic name, concrete
 for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
     std::cout << "symbol : " << it->first << "   value : " << it->second << std::endl;
 }
+
+// testing concritize function
+bool ret_con = z3_handler_test->Z3SolveConcritize(obj, 1, ret_solver);
+std::cout << "result of concritize : " << ret_con << std::endl;
 ```
 
 

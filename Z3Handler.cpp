@@ -25,6 +25,9 @@ Z3Handler::Z3Handler(): context_(g_z3_context){}
 Z3Handler::~Z3Handler(){}
 
 // TODO should directly invoke ExprPtr?
+/* Input : z3::model, usually from solver.getmodel()
+ * Output: a map which stores the symbolic variables and its solved concrte value
+ */
 std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
     std::map<std::string, unsigned long long> ret;
     //expr constraints = Z3HandlingExprPtr(ptr);
@@ -40,6 +43,39 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
         //std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
         ret.insert(std::pair<std::string, unsigned long long>(v.name().str(), m.get_const_interp(v).get_numeral_uint64()));
     }
+    return ret;
+}
+
+/*
+ * Function: check whether a constraint can be true when concritizing a symbolic variable
+ * Input: 1) Symbolic object defined in SYMemObject*; 2)the concrete value; 3) the returned z3::expr, usually returned by Z3HandlingExprPtr()
+ * Output: a bool value : true/false
+ *
+*/
+bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, z3::expr exp){
+    bool ret;
+    //z3::solver Solver(context_);
+    g_solver.add(exp);
+    std::cout << "checking sat/unsat before concritization: " << g_solver.check() << std::endl;
+
+    // checking whether the input obj exists in the corrent constraints, raise an error if yes;
+    if (symObjectsMap.find(obj) == symObjectsMap.end()) {
+        printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
+        throw obj;
+    }
+    // otherwise, get the symbolic expr in Z3 and add the extra constraint
+    expr value_expr = context_.bv_val(value, 64); // any bad effects when it's 64-bit?
+    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+        if (it->first == obj) {
+            expr sym_expr = it->second;
+            g_solver.add(sym_expr == value_expr);
+        }
+    }
+    std::cout << "checking sat/unsat after concritization: " << g_solver.check() << std::endl;
+    if (g_solver.check() == sat)
+        ret = true;
+    else
+        ret = false;
     return ret;
 }
 
@@ -244,6 +280,7 @@ z3::expr Z3Handler::Z3HandleUND(ExprPtr udef_expr_ptr){
     std::string sym_name = obj->name;
     unsigned long long size = obj->size;
     expr x = context_.bv_const(sym_name.c_str(), size*8);
+    symObjectsMap.insert(std::pair<SYMemObject*, z3::expr>(obj, x));
     return x;
 }
 
