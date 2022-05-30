@@ -89,7 +89,9 @@ void test(){
     }
 
     // testing concritize function
-    bool ret_con = z3_handler_test->Z3SolveConcritize(obj, 1, ret_solver);
+    // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'ret_solver' is the constraint just returned
+    int value =1;
+    bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, ret_solver);
     std::cout << "result of concritize : " << ret_con << std::endl;
 }
 

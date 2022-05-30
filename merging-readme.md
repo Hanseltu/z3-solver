@@ -69,7 +69,8 @@ for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
 }
 
 // testing concritize function
-bool ret_con = z3_handler_test->Z3SolveConcritize(obj, 1, ret_solver);
+int value = 1;
+bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, ret_solver);
 std::cout << "result of concritize : " << ret_con << std::endl;
 ```
 
