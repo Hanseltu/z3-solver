@@ -22,7 +22,7 @@ symbol : niceval   value : 0
 
 ## Start merging
 
-### Step 1: dealing with `Expr.h`
+### Step 1: deal with `Expr.h`
 
 * Replace the original `Expr.h` with the one in the `z3-solver` folder
 * Comment the definition of `SYMemObject` (Lines 52-58) in the new `Expr.h`
@@ -48,7 +48,7 @@ z3::context g_z3_context;
 z3::solver g_solver(g_z3_context);
 ```
 
-### Step 4 : invoke z3-solver and return a map to further use (add the code, for example, in Lines 76-87, in `test-merge.c` in target place)
+### Step 4 : invoke `z3-solver` and return a `map` for the further using (add the code, for example, in Lines 76-87, in `test-merge.c` in target place)
 
 * The constraint `equal_expr` can be replaced with our own
 ```
