@@ -25,19 +25,20 @@ Z3Handler::Z3Handler(): context_(g_z3_context){}
 Z3Handler::~Z3Handler(){}
 
 // TODO not work for now
-std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(ExprPtr ptr){
+std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
     std::map<std::string, unsigned long long> ret;
-    expr constraints = Z3HandlingExprPtr(ptr);
+    //expr constraints = Z3HandlingExprPtr(ptr);
     //solver Solver(context_);
-    //Solver.add(constraints);
-    g_solver.add(constraints);
-    std::cout << "Solver: " << g_solver << std::endl;
-    model m = g_solver.get_model();
+    //Solver.add(exp);
+    //g_solver.add(*exp);
+    //std::cout << "solver: " << g_solver << std::endl;
+    //model m = g_solver.get_model();
     for (unsigned i = 0; i < m.size(); i++) {
         func_decl v = m[i];
         // this problem contains only constants
         assert(v.arity() == 0);
-        std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+        //std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+        ret.insert(std::pair<std::string, unsigned long long>(v.name().str(), m.get_const_interp(v).get_numeral_uint64()));
     }
     return ret;
 }
@@ -148,12 +149,10 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return Z3HandleAShr(R, L);
         }
         case Expr::Kind::Equal:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
-            throw ptr;
+            return Z3HandleEqual(ptr);
         }
         case Expr::Kind::Distinct:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
-            throw ptr;
+            return Z3HandleDistinct(ptr);
         }
         case Expr::Kind::Ult:{
             return Z3HandleUlt(ptr);
@@ -182,6 +181,13 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
         case Expr::Kind::Lor:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
             throw ptr;
+        }
+        case Expr::Kind::LAnd:{
+            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
+            throw ptr;
+        }
+        case Expr::Kind::LNot:{
+            return ! Z3HandleLNot(ptr); // TODO need to confirm further
         }
         case Expr::Kind::SignEXT:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
@@ -249,7 +255,7 @@ z3::expr Z3Handler::Z3HandleConst(ExprPtr const_expr_ptr){ // 3
     }
     uint64_t value = const_expr->getValue();
     //std::cout << "value in ConstExpr : " << value << std::endl;
-    expr x = context_.bv_val(value, 64);
+    expr x = context_.bv_val(value, 32);
     return x;
 }
 
@@ -268,13 +274,13 @@ z3::expr Z3Handler::Z3HandleUry(ExprPtr ptr){ // not sure how to write z3 expr
 
 z3::expr Z3Handler::Z3HandleAdd(ExprPtr r, ExprPtr l){ // 7
     //context c;
-    expr ret = Z3HandlingExprPtr(r) + Z3HandlingExprPtr(l);
+    expr ret = (Z3HandlingExprPtr(r) + Z3HandlingExprPtr(l));
     //TODO need to handle signed/unsigned ?
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSub(ExprPtr r, ExprPtr l){
-    expr ret = Z3HandlingExprPtr(l) - Z3HandlingExprPtr(r);
+    expr ret = (Z3HandlingExprPtr(l) - Z3HandlingExprPtr(r));
     return ret;
 }
 
@@ -355,11 +361,23 @@ z3::expr Z3Handler::Z3HandleAShr(ExprPtr r, ExprPtr l){ // 21
 }
 
 z3::expr Z3Handler::Z3HandleEqual(ExprPtr ptr){ //  Should have two sub-expressions?
-    return context_.bv_val(100, 64);
+    EqualExpr *equal_expr = static_cast<EqualExpr*>(ptr.get());
+    if (equal_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : EqualExpr \033[0m\n");
+        throw equal_expr;
+    }
+    expr x = Z3HandlingExprPtr(equal_expr->getExprPtr());
+    return (x == 0);
 }
 
 z3::expr Z3Handler::Z3HandleDistinct(ExprPtr ptr){ // Should have two sub-expressions?
-    return context_.bv_val(100, 64);
+    DistinctExpr *dist_expr = static_cast<DistinctExpr*>(ptr.get());
+    if (dist_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : DistinctExpr \033[0m\n");
+        throw dist_expr;
+    }
+    expr x = Z3HandlingExprPtr(dist_expr->getExprPtr());
+    return (x != 0);
 }
 
 
@@ -469,7 +487,8 @@ z3::expr Z3Handler::Z3HandleLNot(ExprPtr ptr){
         throw lnot_expr;
     }
     expr x = Z3HandlingExprPtr(lnot_expr->getExprPtr());
-    expr ret = ! x; // TODO need to confirm: compare with zero?
+    expr ret = !x ; // TODO need to confirm: compare with zero?
+    //ret = (ret != 0);
     return ret;
 }
 
@@ -515,5 +534,8 @@ z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     expr x = Z3HandlingExprPtr(extract_expr->getExprPtr());
     int s = extract_expr->getStart();
     int e = extract_expr->getEnd();
-    return x.extract(e, s); // looks different with the existing implementation
+    //std::cout << "start : " << s << std::endl;
+    //std::cout << "end : " << e << std::endl;
+    // Finally, it should be 32-bit
+    return x.extract(e*8 - 1, s); // looks different with the existing implementation
 }

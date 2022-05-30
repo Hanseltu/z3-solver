@@ -111,7 +111,7 @@ void bitvector_example(){
     context c;
     expr x = c.bv_const("x", 64);
     solver s(c);
-    s.add(x == 100);
+    s.add(x == 100 and x < 1);
     std::cout << "s : " << s << std::endl;
     std::cout << "stm_lib2: " << s.to_smt2() << std::endl;
     std::cout << "sat? : " << s.check() << std::endl;
@@ -162,11 +162,12 @@ void test(){
     std::cout << "ret_udef : " << ret_udef << std::endl;
 
     //testing Const
-    ExprPtr const_expr = std::make_shared<ConstExpr>(0x64);
+    ExprPtr const_expr = std::make_shared<ConstExpr>(0x01);
     expr ret_const = z3_handler->Z3HandleConst(const_expr);
     std::cout << "ret_const : " << ret_const << std::endl;
 
     //testing Add
+    /*
     ExprPtr add_expr = std::make_shared<AddExpr>(const_expr, udef_expr);
     expr ret_add =  z3_handler->Z3HandleAdd(const_expr, udef_expr);
     std::cout << "ret_add : " << ret_add << std::endl;
@@ -179,15 +180,38 @@ void test(){
     std::cout << "+++ Original Expression: " ;
     sge->print();
     std::cout << "\n";
+    */
+    // testing LNot(Ugt(Sub(0x2, Extract(Combine(0x, which_rdi), 0, 4)))
+    ExprPtr const_expr1 = std::make_shared<ConstExpr>(0x0);
+    ExprPtr const_expr2 = std::make_shared<ConstExpr>(0x2);
+    CombineExpr *combine = new CombineExpr(const_expr1, udef_expr, 0, 0);
+    ExprPtr combine_expr = std::make_shared<CombineExpr>(udef_expr, const_expr1, 0, 0);
+    ExprPtr extract_expr = std::make_shared<ExtractExpr>(combine_expr, 0, 4);
+    ExprPtr sub_expr = std::make_shared<SubExpr>(extract_expr, const_expr2);
+    ExprPtr ugt_expr = std::make_shared<UgtExpr>(sub_expr);
+    ExprPtr lnot_expr = std::make_shared<LNotExpr>(ugt_expr);
+    LNotExpr *lnot = static_cast<LNotExpr*>(lnot_expr.get());
+    std::cout << "+++ Original Expression: " ;
+    lnot->print();
+    std::cout << "\n";
+    expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
+    expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
+    std::cout << "ret_extract length : " << ret_extract.get_sort() << std::endl;
+    expr ret_sub = z3_handler->Z3HandleSub(extract_expr, const_expr2);
+    //expr ret_solver = z3_handler->Z3HandlingExprPtr(lnot_expr);
 
-    //expr ret_sge = z3_handler->Z3HandleSge(sge_expr);
-    //expr ret_sge = z3_handler->Z3HandlingExprPtr(sge_expr);
-    z3_handler->Z3SolveOne(sge_expr);
-    //g_solver.add(ret_sge);
-
+    // testing Equal(And(Extract(Combine(0x, which_rdi), 0, 4), Extract(Combine(0x0, which_rdi), 0, 4)))
+    ExprPtr and_expr = std::make_shared<AndExpr>(extract_expr, extract_expr);
+    ExprPtr equal_expr = std::make_shared<EqualExpr>(and_expr);
+    EqualExpr *equal = static_cast<EqualExpr*>(equal_expr.get());
+    std::cout << "+++ Original Expression: " ;
+    equal->print();
+    std::cout << "\n";
+    expr ret_solver = z3_handler->Z3HandlingExprPtr(equal_expr);
+    g_solver.add(ret_solver);
     // testing handlingExprPtr
-    expr ret_expr_ptr = z3_handler->Z3HandlingExprPtr(udef_expr);
-    delete obj;
+    //expr ret_expr_ptr = z3_handler->Z3HandlingExprPtr(udef_expr);
+    //delete obj;
 }
 
 int main(){
@@ -197,17 +221,26 @@ int main(){
     //bitvector_example2();
     //bitvector_example();
     test();
-    /*
     // traversing the model
     std::cout << "g_solver : " << g_solver.check() << g_solver << std::endl;
-    std::cout << "### solver results: " << "\n";
     model m = g_solver.get_model();
+    Z3Handler *z3_handler = new Z3Handler();
+    std::map<std::string, unsigned long long> ret;
+    ret = z3_handler->Z3SolveOne(m);
+    std::cout << "### solver results: " << "\n";
+    //std::map<std::string, unsigned long long>::iterator it;
+    for (auto it = ret.begin(); it != ret.end(); it ++){
+        std::cout << "symbol : " << it->first << "   value : " << it->second << std::endl;
+    }
+    /*
     for (unsigned i = 0; i < m.size(); i++) {
         func_decl v = m[i];
         // this problem contains only constants
         assert(v.arity() == 0);
         std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
     }
+    */
+    /*
     //Expr *exprptr = new Expr(8, 0);
     ExprPtr sptr = std::make_shared<UDefExpr>(obj);
     ExtractExpr *ext = new ExtractExpr(sptr, 0, 4);

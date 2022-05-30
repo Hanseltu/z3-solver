@@ -25,7 +25,7 @@ public:
     virtual ~Z3Handler();
 
     // solver function
-    std::map<std::string, unsigned long long> Z3SolveOne(ExprPtr ptr);
+    std::map<std::string, unsigned long long> Z3SolveOne(z3::model m); // better to use ExprPtr as input?
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
