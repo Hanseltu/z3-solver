@@ -81,7 +81,7 @@ void test(){
     }
     model m = g_solver.get_model();
     std::map<std::string, unsigned long long> ret_result;
-    ret_result = z3_handler->Z3SolveOne(m); // now the [symbolic name, concrete value] map will be returned
+    ret_result = z3_handler_test->Z3SolveOne(m); // now the [symbolic name, concrete value] map will be returned
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << "   value : " << it->second << std::endl;
     }
