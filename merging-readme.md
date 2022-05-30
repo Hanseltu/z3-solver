@@ -48,7 +48,7 @@ z3::context g_z3_context;
 z3::solver g_solver(g_z3_context);
 ```
 
-### Step 4 : invoke `z3-solver` and return a `map` for the further using (add the code, for example, in Lines 76-87, in `test-merge.c` in target place)
+### Step 4 : invoke `z3-solver` and return a `map` for the further using (add the code, for example, in Lines 76-87, in `test-merge.cc` in target place)
 
 * The constraint `equal_expr` can be replaced with our own
 ```
