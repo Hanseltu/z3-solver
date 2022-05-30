@@ -24,7 +24,7 @@ Z3Handler::Z3Handler(): context_(g_z3_context){}
 
 Z3Handler::~Z3Handler(){}
 
-// TODO not work for now
+// TODO should directly invoke ExprPtr?
 std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
     std::map<std::string, unsigned long long> ret;
     //expr constraints = Z3HandlingExprPtr(ptr);
