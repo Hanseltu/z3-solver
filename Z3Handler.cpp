@@ -55,10 +55,11 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
 bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, z3::expr exp){
     bool ret;
     //z3::solver Solver(context_);
+    g_solver.reset();
     g_solver.add(exp);
     std::cout << "checking sat/unsat before concritization: " << g_solver.check() << std::endl;
 
-    // checking whether the input obj exists in the corrent constraints, raise an error if yes;
+    // checking whether the input obj exists in the corrent constraints, raise an error if no;
     if (symObjectsMap.find(obj) == symObjectsMap.end()) {
         printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
         throw obj;
@@ -72,6 +73,7 @@ bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, z3::expr
         }
     }
     std::cout << "checking sat/unsat after concritization: " << g_solver.check() << std::endl;
+    //std::cout << g_solver << std::endl;
     if (g_solver.check() == sat)
         ret = true;
     else

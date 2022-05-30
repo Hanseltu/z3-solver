@@ -72,6 +72,7 @@ void test(){
     std::cout << "+++ Original Expression: \n" ;
     equal->print();
     std::cout << "\n";
+    g_solver.reset();
 
     // Merging from here; assuming we have got an constraint (ExprPtr), 'equal_expr' in this code
     Z3Handler *z3_handler_test = new Z3Handler();
