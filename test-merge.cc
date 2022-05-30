@@ -1,6 +1,3 @@
-#include<vector>
-#include"z3++.h"
-
 #include "Expr.h"
 #include "Z3Handler.h"
 #include <map>
