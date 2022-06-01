@@ -17,10 +17,20 @@ LNot(Ugt(Sub(2,Extract(Combine(0,niceval), 0, 4))))
 ret_extract length : (_ BitVec 32)
 +++ Original Expression: 
 Equal(And(Extract(Combine(0,niceval), 0, 4),Extract(Combine(0,niceval), 0, 4)))
+solver: (declare-fun niceval () (_ BitVec 64))
+(assert (let ((a!1 (bvugt (bvsub #x00000002
+                         ((_ extract 31 0) (concat #x00000000 niceval)))
+                  #x00000000))
+      (a!2 (= (bvand ((_ extract 31 0) (concat #x00000000 niceval))
+                     ((_ extract 31 0) (concat #x00000000 niceval)))
+              #x00000000)))
+  (and true (not (not a!1)) a!2)))
+sat
 symbol : niceval   value : 0
 checking sat/unsat before concritization: sat
 checking sat/unsat after concritization: unsat
 result of concritize : 0
+
 ```
 
 ## Start merging
@@ -36,7 +46,7 @@ result of concritize : 0
 g++ -g test-merge.cc Expr.cpp Z3Handler.cpp z3/libz3.so -I ./z3/include -o z3-test
 ```
 
-### Step 3 : add the following head file and global variable definition in the file which may invoke the solver
+### Step 3 : add the following head file in the file which may invoke the solver
 
 ```
 #include "Expr.h"
@@ -46,31 +56,22 @@ g++ -g test-merge.cc Expr.cpp Z3Handler.cpp z3/libz3.so -I ./z3/include -o z3-te
 using namespace z3;
 using namespace EXPR;
 using namespace Z3HANDLER;
-
-z3::context g_z3_context;
-z3::solver g_solver(g_z3_context);
 ```
 
 ### Step 4 : invoke `z3-solver` and return a `map` for the further using (add the code, for example, in Lines 76-87, in `test-merge.cc` in target place)
 
-* The constraint `equal_expr` can be replaced with our own
+* The constraint `constraints_test` can be replaced with our own
 ```
 Z3Handler *z3_handler_test = new Z3Handler();
-expr ret_solver = z3_handler_test->Z3HandlingExprPtr(equal_expr);
-g_solver.add(ret_solver);
-if (g_solver.check() == unsat){
-    std::cout << "The constraints is unsolveable -:)" << std::endl;
-}
-model m = g_solver.get_model();
 std::map<std::string, unsigned long long> ret_result;
-ret_result = z3_handler_test->Z3SolveOne(m); // now the [symbolic name, concrete value] map will be returned
+ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
 for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
     std::cout << "symbol : " << it->first << "   value : " << it->second << std::endl;
 }
 
 // testing concritize function
 int value = 1;
-bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, ret_solver);
+bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, constraints_test);
 std::cout << "result of concritize : " << ret_con << std::endl;
 ```
 

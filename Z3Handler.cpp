@@ -18,24 +18,26 @@ void perror(char *const msg){ //TODO
 using namespace z3;
 using namespace Z3HANDLER;
 
-extern z3::solver g_solver;
+z3::context g_z3_context;
+z3::solver g_solver(g_z3_context);
 
-Z3Handler::Z3Handler(): context_(g_z3_context){}
+Z3Handler::Z3Handler() : context_(g_z3_context){}
 
 Z3Handler::~Z3Handler(){}
 
-// TODO should directly invoke ExprPtr?
-/* Input : z3::model, usually from solver.getmodel()
+/* Input : a set of constraints
  * Output: a map which stores the symbolic variables and its solved concrte value
  */
-std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
+std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprPtr> constraints){
     std::map<std::string, unsigned long long> ret;
-    //expr constraints = Z3HandlingExprPtr(ptr);
-    //solver Solver(context_);
-    //Solver.add(exp);
-    //g_solver.add(*exp);
-    //std::cout << "solver: " << g_solver << std::endl;
-    //model m = g_solver.get_model();
+    g_solver.reset();
+    expr exprs = context_.bool_val(1);
+    for (auto it = constraints.begin(); it != constraints.end(); it++){
+        exprs = exprs & Z3HandlingExprPtr(*it);
+    }
+    g_solver.add(exprs);
+    std::cout << "solver: " << g_solver << g_solver.check() << std::endl;
+    model m = g_solver.get_model();
     for (unsigned i = 0; i < m.size(); i++) {
         func_decl v = m[i];
         // this problem contains only constants
@@ -48,15 +50,19 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(z3::model m){
 
 /*
  * Function: check whether a constraint can be true when concritizing a symbolic variable
- * Input: 1) Symbolic object defined in SYMemObject*; 2)the concrete value; 3) the returned z3::expr, usually returned by Z3HandlingExprPtr()
+ * Input: 1) Symbolic object defined in SYMemObject*; 2)the concrete value; 3) a set of constraints
  * Output: a bool value : true/false
  *
 */
-bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, z3::expr exp){
+bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, std::set<KVExprPtr> constraints){
     bool ret;
     //z3::solver Solver(context_);
     g_solver.reset();
-    g_solver.add(exp);
+    expr exprs = context_.bool_val(1);
+    for (auto it = constraints.begin(); it != constraints.end(); it++){
+        exprs = exprs & Z3HandlingExprPtr(*it);
+    }
+    g_solver.add(exprs);
     std::cout << "checking sat/unsat before concritization: " << g_solver.check() << std::endl;
 
     // checking whether the input obj exists in the corrent constraints, raise an error if no;

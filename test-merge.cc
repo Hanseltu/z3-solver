@@ -7,8 +7,8 @@ using namespace EXPR;
 using namespace Z3HANDLER;
 
 
-z3::context g_z3_context;
-z3::solver g_solver(g_z3_context);
+//z3::context g_z3_context;
+//z3::solver g_solver(g_z3_context);
 
 
 void test(){
@@ -72,26 +72,24 @@ void test(){
     std::cout << "+++ Original Expression: \n" ;
     equal->print();
     std::cout << "\n";
-    g_solver.reset();
+    //g_solver.reset();
 
-    // Merging from here; assuming we have got an constraint (ExprPtr), 'equal_expr' in this code
+    // Merging from here; assuming we have got an constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
+    std::set<KVExprPtr> constraints_test;
+    constraints_test.insert(equal_expr);
+    constraints_test.insert(lnot_expr);
+
     Z3Handler *z3_handler_test = new Z3Handler();
-    expr ret_solver = z3_handler_test->Z3HandlingExprPtr(equal_expr);
-    g_solver.add(ret_solver);
-    if (g_solver.check() == unsat){
-        std::cout << "The constraints is unsolveable -:)" << std::endl;
-    }
-    model m = g_solver.get_model();
     std::map<std::string, unsigned long long> ret_result;
-    ret_result = z3_handler_test->Z3SolveOne(m); // now the [symbolic name, concrete value] map will be returned
+    ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << "   value : " << it->second << std::endl;
     }
 
     // testing concritize function
-    // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'ret_solver' is the constraint just returned
+    // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     int value =1;
-    bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, ret_solver);
+    bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, constraints_test);
     std::cout << "result of concritize : " << ret_con << std::endl;
 }
 

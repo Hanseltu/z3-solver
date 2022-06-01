@@ -7,17 +7,21 @@
  *
 */
 
-
 #include"z3++.h"
 #include "Expr.h"
 #include <map>
-extern z3::context g_z3_context;
+#include <set>
+
+typedef EXPR::Expr KVExpr;
+typedef std::shared_ptr<KVExpr> KVExprPtr;
+
 using namespace EXPR;
 // using namespace z3;
 namespace Z3HANDLER {
 class Z3Handler{
 protected:
     z3::context& context_;
+    //z3::solver& g_solver(context_);
 public:
     //z3::expr x = c.int_val(0);
 
@@ -27,10 +31,10 @@ public:
     // a set to store symbolic objects
     std::map<SYMemObject*, z3::expr> symObjectsMap;
     // solver function
-    std::map<std::string, unsigned long long> Z3SolveOne(z3::model m); // better to use ExprPtr as input?
+    std::map<std::string, unsigned long long> Z3SolveOne(std::set<KVExprPtr> constraints); // better to use ExprPtr as input?
 
     // concritize function
-    bool Z3SolveConcritize(SYMemObject*, unsigned int value,  z3::expr);
+    bool Z3SolveConcritize(SYMemObject*, unsigned int value,  std::set<KVExprPtr> constraints);
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
