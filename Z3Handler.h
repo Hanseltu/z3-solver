@@ -2,7 +2,7 @@
 #define _Z3HANDLER_H__
 
 
-/* @THX class for transfer constraint
+/* @THX class for transfer constraints
  *
  *
 */
@@ -16,22 +16,19 @@ typedef EXPR::Expr KVExpr;
 typedef std::shared_ptr<KVExpr> KVExprPtr;
 
 using namespace EXPR;
-// using namespace z3;
+
 namespace Z3HANDLER {
 class Z3Handler{
 protected:
     z3::context& context_;
-    //z3::solver& g_solver(context_);
 public:
-    //z3::expr x = c.int_val(0);
-
     Z3Handler();
     virtual ~Z3Handler();
 
     // a set to store symbolic objects
     std::map<SYMemObject*, z3::expr> symObjectsMap;
     // solver function
-    std::map<std::string, unsigned long long> Z3SolveOne(std::set<KVExprPtr> constraints); // better to use ExprPtr as input?
+    std::map<std::string, unsigned long long> Z3SolveOne(std::set<KVExprPtr> constraints);
 
     // concritize function
     bool Z3SolveConcritize(SYMemObject*, unsigned int value,  std::set<KVExprPtr> constraints);
