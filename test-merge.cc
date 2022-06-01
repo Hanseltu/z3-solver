@@ -67,7 +67,7 @@ void test(){
     std::cout << "\n";
     //g_solver.reset();
 
-    // Merging from here; assuming we have got an constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
+    // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
     constraints_test.insert(equal_expr);
     constraints_test.insert(lnot_expr);
