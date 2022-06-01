@@ -49,9 +49,7 @@ g++ -g test-merge.cc Expr.cpp Z3Handler.cpp z3/libz3.so -I ./z3/include -o z3-te
 ### Step 3 : add the following head file in the file which may invoke the solver
 
 ```
-#include "Expr.h"
 #include "Z3Handler.h"
-#include <map>
 
 using namespace z3;
 using namespace EXPR;
