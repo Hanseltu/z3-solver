@@ -4,11 +4,6 @@
 
 using namespace z3;
 using namespace EXPR;
-using namespace Z3HANDLER;
-
-
-//z3::context g_z3_context;
-//z3::solver g_solver(g_z3_context);
 
 
 void test(){
@@ -19,7 +14,7 @@ void test(){
     obj->size = 8;
     UDefExpr *sym_expr = new UDefExpr(obj);
     // Z3HandleUND(sym)
-    Z3Handler *z3_handler = new Z3Handler();
+    Z3HANDLER::Z3Handler *z3_handler = new Z3HANDLER::Z3Handler();
 
 
     // testing UDefExpr
@@ -79,7 +74,7 @@ void test(){
     constraints_test.insert(equal_expr);
     constraints_test.insert(lnot_expr);
 
-    Z3Handler *z3_handler_test = new Z3Handler();
+    Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
     ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){

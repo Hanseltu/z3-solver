@@ -55,14 +55,13 @@ g++ -g test-merge.cc Expr.cpp Z3Handler.cpp z3/libz3.so -I ./z3/include -o z3-te
 
 using namespace z3;
 using namespace EXPR;
-using namespace Z3HANDLER;
 ```
 
 ### Step 4 : invoke `z3-solver` and return a `map` for the further using (add the code, for example, in Lines 76-87, in `test-merge.cc` in target place)
 
 * The constraint `constraints_test` can be replaced with our own
 ```
-Z3Handler *z3_handler_test = new Z3Handler();
+Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
 std::map<std::string, unsigned long long> ret_result;
 ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
 for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
