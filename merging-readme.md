@@ -1,7 +1,7 @@
 ## Testing before merging (check whether z3 library can work in the target machine alone)
 
 ```
-$git clone git@github.com:Hanseltu/z3-solver.git
+$git clone https://github.com/Hanseltu/z3-solver.git
 $cd z3-solver
 z3-solver#./compile.sh
 z3-solver#./z3-test
