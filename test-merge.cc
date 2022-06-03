@@ -91,7 +91,7 @@ void test(){
     ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << std::endl;
-        printf("value : %llu \n", it->second);
+        printf("value : %llu(dec) %x(hex) \n", it->second, (unsigned int) it->second);
     }
 
     // testing concritize function
