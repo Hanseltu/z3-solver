@@ -61,9 +61,9 @@ void ConstExpr::print () {
 
 void BinExpr::print () {
     std::cout<<exprName[exprID]<<"(";
-    L->print();
-    std::cout<<",";
     R->print();
+    std::cout<<",";
+    L->print();
     std::cout<<")";
 }
 

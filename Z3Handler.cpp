@@ -33,17 +33,37 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
     g_solver.reset();
     expr exprs = context_.bool_val(1);
     for (auto it = constraints.begin(); it != constraints.end(); it++){
-        exprs = exprs & Z3HandlingExprPtr(*it);
+        exprs = exprs and Z3HandlingExprPtr(*it);
+        //expr expr_temp = Z3HandlingExprPtr(*it);
+        //g_solver.add(expr_temp);
     }
     g_solver.add(exprs);
-    std::cout << "solver: " << g_solver << g_solver.check() << std::endl;
-    model m = g_solver.get_model();
-    for (unsigned i = 0; i < m.size(); i++) {
-        func_decl v = m[i];
-        // this problem contains only constants
-        assert(v.arity() == 0);
-        //std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
-        ret.insert(std::pair<std::string, unsigned long long>(v.name().str(), m.get_const_interp(v).get_numeral_uint64()));
+    std::cout << "solver: " << g_solver <<  std::endl;
+    // produce .smt2 file which can be used in other solvers
+    //std::cout << "smt2 :" << g_solver.to_smt2() << "\n done" << std::endl;
+    switch (g_solver.check()){
+        case sat: {
+                std::cout << "SAT" << std::endl;
+                model m = g_solver.get_model();
+                for (unsigned i = 0; i < m.size(); i++) {
+                    func_decl v = m[i];
+                    // this problem contains only constants
+                    assert(v.arity() == 0);
+                    //std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+                    ret.insert(std::pair<std::string, unsigned long long>(v.name().str(), m.get_const_interp(v).get_numeral_uint64()));
+                }
+                break;
+                }
+        case unsat:{
+                std::cout << "UNSAT" << std::endl;
+                printf("\033[47;31m Oops, constraints are unsolvable ... ! \033[0m\n");
+                break;
+                }
+        case unknown:{
+                std::cout << "UNKNOWN" << std::endl;
+                printf("\033[47;31m Oops, constraints are unsolvable ... ! \033[0m\n");
+                break;
+                }
     }
     return ret;
 }
@@ -231,7 +251,8 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             throw ptr;
         }
         case Expr::Kind::LNot:{
-            return ! Z3HandleLNot(ptr); // TODO need to confirm further
+            expr ex = Z3HandleLNot(ptr);
+            return ex; // TODO need to confirm further
         }
         case Expr::Kind::SignEXT:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
@@ -458,6 +479,7 @@ z3::expr Z3Handler::Z3HandleUgt(ExprPtr ptr){
     }
     expr x = Z3HandlingExprPtr(ugt_expr->getExprPtr());
     expr ret = z3::ugt(x, 0);
+    //expr ret =  (x > 0);
     return ret;
 }
 
@@ -531,9 +553,10 @@ z3::expr Z3Handler::Z3HandleLNot(ExprPtr ptr){
         printf("\033[47;31m Z3 Handlering ERROR : LNotExpr \033[0m\n");
         throw lnot_expr;
     }
-    expr x = Z3HandlingExprPtr(lnot_expr->getExprPtr());
-    expr ret = !x ; // TODO need to confirm: compare with zero?
-    //ret = (ret != 0);
+    //expr x = Z3HandlingExprPtr(lnot_expr->getExprPtr());
+    expr ret = Z3HandleDistinct(lnot_expr->getExprPtr());
+    //expr ret = (! x); // TODO need to confirm: compare with zero?
+    //expr ret = !x;
     return ret;
 }
 
@@ -583,4 +606,5 @@ z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     //std::cout << "end : " << e << std::endl;
     // Finally, it should be 32-bit
     return x.extract(e*8 - 1, s); // looks different with the existing implementation
+    //return x.extract(63,  32); // looks different with the existing implementation
 }
