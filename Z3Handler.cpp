@@ -74,9 +74,10 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
  * Output: a bool value : true/false
  *
 */
-bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, std::set<KVExprPtr> constraints){
+bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector<unsigned int> values, std::set<KVExprPtr> constraints){
     bool ret;
     //z3::solver Solver(context_);
+    symObjectsMap.clear(); // reset map to be null
     g_solver.reset();
     expr exprs = context_.bool_val(1);
     for (auto it = constraints.begin(); it != constraints.end(); it++){
@@ -85,17 +86,23 @@ bool Z3Handler::Z3SolveConcritize(SYMemObject* obj, unsigned int value, std::set
     g_solver.add(exprs);
     std::cout << "checking sat/unsat before concritization: " << g_solver.check() << std::endl;
 
-    // checking whether the input obj exists in the corrent constraints, raise an error if no;
-    if (symObjectsMap.find(obj) == symObjectsMap.end()) {
-        printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
-        throw obj;
+    if (symobjs.size() != values.size()) {
+        printf("\033[47;31m Z3 Handlering ERROR : The number of corresponding symbols and values under concritization is not the same! \033[0m\n");
+        exit(1); //shoud we just exit?
     }
-    // otherwise, get the symbolic expr in Z3 and add the extra constraint
-    expr value_expr = context_.bv_val(value, 64); // any bad effects when it's 64-bit?
-    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
-        if (it->first == obj) {
-            expr sym_expr = it->second;
-            g_solver.add(sym_expr == value_expr);
+    for (int i = 0; i < symobjs.size(); i++){
+        // checking whether the input obj exists in the corrent constraints, raise an error if no;
+        if (symObjectsMap.find(symobjs[i]) == symObjectsMap.end()) {
+            printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
+            //throw symobjs[i];
+        }
+        // otherwise, get the symbolic expr in Z3 and add the extra constraint
+        expr value_expr = context_.bv_val(values[i], 32); // any bad effects when it's 64-bit?
+        for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+            if (it->first == symobjs[i]) {
+                expr sym_expr = it->second;
+                g_solver.add(sym_expr == value_expr);
+            }
         }
     }
     std::cout << "checking sat/unsat after concritization: " << g_solver.check() << std::endl;

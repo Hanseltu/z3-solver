@@ -40,13 +40,14 @@ void test(){
     std::cout << "\n";
 
     // testing LNot(Ugt(Sub(0x2, Extract(Combine(0x, which_rdi), 0, 4)))
-    ExprPtr const_expr1 = std::make_shared<ConstExpr>(0x1);
+    ExprPtr const_expr1 = std::make_shared<ConstExpr>(0x0);
     ExprPtr const_expr2 = std::make_shared<ConstExpr>(0x2);
+    ExprPtr const_expr3 = std::make_shared<ConstExpr>(0x1);
     CombineExpr *combine = new CombineExpr(const_expr1, udef_expr, 0, 0);
     ExprPtr combine_expr = std::make_shared<CombineExpr>(udef_expr, const_expr1, 0, 0);
     ExprPtr extract_expr = std::make_shared<ExtractExpr>(combine_expr, 0, 4);
     ExprPtr sub_expr = std::make_shared<SubExpr>(const_expr2, extract_expr);
-    ExprPtr sub_expr1 = std::make_shared<SubExpr>(const_expr1, extract_expr);
+    ExprPtr sub_expr1 = std::make_shared<SubExpr>(const_expr3, extract_expr);
     //ExprPtr sub_expr = std::make_shared<SubExpr>(extract_expr, const_expr1);
     ExprPtr ugt_expr = std::make_shared<UgtExpr>(sub_expr);
     ExprPtr lnot_expr = std::make_shared<LNotExpr>(ugt_expr);
@@ -96,9 +97,14 @@ void test(){
 
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
-    //int value =1;
-    //bool ret_con = z3_handler_test->Z3SolveConcritize(obj, value, constraints_test);
-    //std::cout << "result of concritize : " << ret_con << std::endl;
+    std::vector<SYMemObject*> symobjts;
+    std::vector<unsigned int> values;
+    symobjts.push_back(obj);
+    symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
+    values.push_back(100);
+    values.push_back(1000);
+    bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, values, constraints_test);
+    std::cout << "result of concritize : " << ret_con << std::endl;
 }
 void eval_example1() {
     std::cout << "eval example 1\n";

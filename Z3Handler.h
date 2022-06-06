@@ -11,7 +11,7 @@
 #include "Expr.h"
 #include <map>
 #include <set>
-
+#include <vector>
 typedef EXPR::Expr KVExpr;
 typedef std::shared_ptr<KVExpr> KVExprPtr;
 
@@ -22,6 +22,8 @@ class Z3Handler{
 protected:
     z3::context& context_;
 public:
+    //z3::context g_z3_context;
+    //z3::solver g_solver(g_z3_context);
     Z3Handler();
     virtual ~Z3Handler();
 
@@ -31,7 +33,7 @@ public:
     std::map<std::string, unsigned long long> Z3SolveOne(std::set<KVExprPtr> constraints);
 
     // concritize function
-    bool Z3SolveConcritize(SYMemObject*, unsigned int value,  std::set<KVExprPtr> constraints);
+    bool Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector<unsigned int> values,  std::set<KVExprPtr> constraints);
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
