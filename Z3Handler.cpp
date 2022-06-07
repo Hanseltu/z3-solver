@@ -85,6 +85,8 @@ bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector
     }
     g_solver.add(exprs);
     std::cout << "checking sat/unsat before concritization: " << g_solver.check() << std::endl;
+    std::cout << g_solver << std::endl;
+    std::cout << "++++++++++++++" << std::endl;
 
     if (symobjs.size() != values.size()) {
         printf("\033[47;31m Z3 Handlering ERROR : The number of corresponding symbols and values under concritization is not the same! \033[0m\n");
@@ -106,7 +108,9 @@ bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector
         }
     }
     std::cout << "checking sat/unsat after concritization: " << g_solver.check() << std::endl;
-    //std::cout << g_solver << std::endl;
+    std::cout << g_solver << std::endl;
+    // produce .smt2 file which can be used in other solvers
+    //std::cout << "smt2 :" << g_solver.to_smt2() << "\n done" << std::endl;
     if (g_solver.check() == sat)
         ret = true;
     else
@@ -226,28 +230,52 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return Z3HandleDistinct(ptr);
         }
         case Expr::Kind::Ult:{
-            return Z3HandleUlt(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleUlt(R, L);
         }
         case Expr::Kind::Ule:{
-            return Z3HandleUle(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleUle(R, L);
         }
         case Expr::Kind::Ugt:{
-            return Z3HandleUgt(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleUgt(R, L);
         }
         case Expr::Kind::Uge:{
-            return Z3HandleUge(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleUge(R, L);
         }
         case Expr::Kind::Slt:{
-            return Z3HandleSlt(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleSlt(R, L);
         }
         case Expr::Kind::Sle:{
-            return Z3HandleSle(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleSle(R, L);
         }
         case Expr::Kind::Sgt:{
-            return Z3HandleSgt(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleSgt(R, L);
         }
         case Expr::Kind::Sge:{ // 31
-            return Z3HandleSge(ptr);
+            BinExpr * e = static_cast<BinExpr*>(ptr.get());
+            ExprPtr R = e->getExprPtrR();
+            ExprPtr L = e->getExprPtrL();
+            return Z3HandleSge(R, L);
         }
         case Expr::Kind::Lor:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
@@ -456,92 +484,60 @@ z3::expr Z3Handler::Z3HandleDistinct(ExprPtr ptr){ // Should have two sub-expres
 
 // for Ult, Ule, Ugt, Uge, Slt, Sle, Sge, Sge, are they only compare with 0? rather than two sub-expressions?
 // If this is the case, is it 0 always in the right side? e.g., x >0 not 0 > x?
-z3::expr Z3Handler::Z3HandleUlt(ExprPtr ptr){
-    UltExpr *ult_expr = static_cast<UltExpr*>(ptr.get());
-    if (ult_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : UltExpr \033[0m\n");
-        throw ult_expr;
-    }
-    expr x = Z3HandlingExprPtr(ult_expr->getExprPtr());
-    expr ret = z3::ult(x, 0);
+z3::expr Z3Handler::Z3HandleUlt(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = z3::ult(x, y);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleUle(ExprPtr ptr){
-    UleExpr *ule_expr = static_cast<UleExpr*>(ptr.get());
-    if (ule_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : UleExpr \033[0m\n");
-        throw ule_expr;
-    }
-    expr x = Z3HandlingExprPtr(ule_expr->getExprPtr());
-    expr ret = z3::ule(x, 0);
+z3::expr Z3Handler::Z3HandleUle(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = z3::ule(x, y);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleUgt(ExprPtr ptr){
-    UgtExpr *ugt_expr = static_cast<UgtExpr*>(ptr.get());
-    if (ugt_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : UleExpr \033[0m\n");
-        throw ugt_expr;
-    }
-    expr x = Z3HandlingExprPtr(ugt_expr->getExprPtr());
-    expr ret = z3::ugt(x, 0);
+z3::expr Z3Handler::Z3HandleUgt(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = z3::ugt(x, y);
     //expr ret =  (x > 0);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleUge(ExprPtr ptr){
-    UgeExpr *uge_expr = static_cast<UgeExpr*>(ptr.get());
-    if (uge_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : UleExpr \033[0m\n");
-        throw uge_expr;
-    }
-    expr x = Z3HandlingExprPtr(uge_expr->getExprPtr());
-    expr ret = z3::uge(x, 0);
+z3::expr Z3Handler::Z3HandleUge(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = z3::uge(x, y);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleSlt(ExprPtr ptr){
-    SltExpr *slt_expr = static_cast<SltExpr*>(ptr.get());
-    if (slt_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : SltExpr \033[0m\n");
-        throw slt_expr;
-    }
-    expr x = Z3HandlingExprPtr(slt_expr->getExprPtr());
-    expr ret = (x < 0);
+z3::expr Z3Handler::Z3HandleSlt(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = (x < y);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleSle(ExprPtr ptr){
-    SleExpr *sle_expr = static_cast<SleExpr*>(ptr.get());
-    if (sle_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : SleExpr \033[0m\n");
-        throw sle_expr;
-    }
-    expr x = Z3HandlingExprPtr(sle_expr->getExprPtr());
-    expr ret = (x <= 0);
+z3::expr Z3Handler::Z3HandleSle(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = (x <= y);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleSgt(ExprPtr ptr){
-    SgtExpr *sgt_expr = static_cast<SgtExpr*>(ptr.get());
-    if (sgt_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : SgtExpr \033[0m\n");
-        throw sgt_expr;
-    }
-    expr x = Z3HandlingExprPtr(sgt_expr->getExprPtr());
-    expr ret = (x > 0);
+z3::expr Z3Handler::Z3HandleSgt(ExprPtr r, ExprPtr l){
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = (x > y);
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleSge(ExprPtr sge_expr_ptr){ // 31
-    SgeExpr *sge_expr = static_cast<SgeExpr*>(sge_expr_ptr.get());
-    if (sge_expr == NULL){
-        printf("\033[47;31m Z3 Handlering ERROR : SgeExpr \033[0m\n");
-        throw sge_expr;
-    }
-    expr x = Z3HandlingExprPtr(sge_expr->getExprPtr());
-    expr ret = (x >= 0); // TODO need to confirm: compare with zero?
+z3::expr Z3Handler::Z3HandleSge(ExprPtr r, ExprPtr l){ // 31
+    expr x = Z3HandlingExprPtr(l);
+    expr y = Z3HandlingExprPtr(r);
+    expr ret = (x >= y);
     return ret;
 }
 

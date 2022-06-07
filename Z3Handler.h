@@ -64,15 +64,15 @@ public:
     z3::expr Z3HandleAShr(ExprPtr r, ExprPtr l); // 21
     z3::expr Z3HandleEqual(ExprPtr equal_expr); // should have two sub-expressions?
     z3::expr Z3HandleDistinct(ExprPtr dist_expr); // should have two sub-expressions?
-    z3::expr Z3HandleUlt(ExprPtr ult_expr); // the following comparison only compare with 0?
-    z3::expr Z3HandleUle(ExprPtr ule_expr);
-    z3::expr Z3HandleUgt(ExprPtr ugt_expr);
-    z3::expr Z3HandleUge(ExprPtr uge_expr);
-    z3::expr Z3HandleSlt(ExprPtr slt_expr);
-    z3::expr Z3HandleSle(ExprPtr sle_expr);
-    z3::expr Z3HandleSgt(ExprPtr sgt_expr);
+    z3::expr Z3HandleUlt(ExprPtr r, ExprPtr l); // the following comparison only compare with 0?
+    z3::expr Z3HandleUle(ExprPtr r, ExprPtr l);
+    z3::expr Z3HandleUgt(ExprPtr r, ExprPtr l);
+    z3::expr Z3HandleUge(ExprPtr r, ExprPtr l);
+    z3::expr Z3HandleSlt(ExprPtr r, ExprPtr l);
+    z3::expr Z3HandleSle(ExprPtr r, ExprPtr l);
+    z3::expr Z3HandleSgt(ExprPtr r, ExprPtr l);
 
-    z3::expr Z3HandleSge(ExprPtr sge_expr); // 31
+    z3::expr Z3HandleSge(ExprPtr r, ExprPtr l); // 31
     z3::expr Z3HandleLor(ExprPtr lor_expr); // not defined in Expr.h
     z3::expr Z3HandleLAnd(ExprPtr land_expr); // not defined in Expr.h
     z3::expr Z3HandleLNot(ExprPtr lnot_expr);

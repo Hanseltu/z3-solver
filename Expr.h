@@ -419,84 +419,92 @@ class DistinctExpr : public UryExpr {
     ExprPtr getExprPtr() { return E; }
 };
 
-class UltExpr : public UryExpr {
+class UltExpr : public BinExpr {
     public:
-        UltExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Ult;}
-        UltExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Ult;}
+        UltExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Ult;}
+        UltExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Ult;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Ult; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
-class UleExpr : public UryExpr {
+class UleExpr : public BinExpr {
     public:
-        UleExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Ule;}
-        UleExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Ule;}
+        UleExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Ule;}
+        UleExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Ule;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Ule; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
-class UgtExpr : public UryExpr {
+class UgtExpr : public BinExpr {
     public:
-        UgtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Ugt;}
-        UgtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Ugt;}
+        UgtExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Ugt;}
+        UgtExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Ugt;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Ugt; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
-class UgeExpr : public UryExpr {
+class UgeExpr : public BinExpr {
     public:
-        UgeExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Uge;}
-        UgeExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Uge;}
+        UgeExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Uge;}
+        UgeExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Uge;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Uge; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
-class SltExpr : public UryExpr {
+class SltExpr : public BinExpr {
     public:
-        SltExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Slt;}
-        SltExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Slt;}
+        SltExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Slt;}
+        SltExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Slt;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Slt; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
-class SleExpr : public UryExpr {
+class SleExpr : public BinExpr {
     public:
-        SleExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sle;}
-        SleExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sle;}
+        SleExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Sle;}
+        SleExpr(ExprPtr r, ExprPtr l,  int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Sle;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sle; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 };
 
-class SgtExpr : public UryExpr {
+class SgtExpr : public BinExpr {
     public:
-        SgtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sgt;}
-        SgtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sgt;}
+        SgtExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Sgt;}
+        SgtExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Sgt;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sgt; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 } ;
 
-class SgeExpr : public UryExpr {
+class SgeExpr : public BinExpr {
     public:
-        SgeExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_Sge;}
-        SgeExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_Sge;}
+        SgeExpr(ExprPtr r, ExprPtr l) : BinExpr(r, l) {exprID = EXPR_Sge;}
+        SgeExpr(ExprPtr r, ExprPtr l, int sz, int off) : BinExpr(r, l, sz, off) {exprID = EXPR_Sge;}
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sge; }
-    ExprPtr getExprPtr() { return E; }
+    ExprPtr getExprPtrR() { return R; }
+    ExprPtr getExprPtrL() { return L; }
 } ;
 
 class SignExpr : public UryExpr {

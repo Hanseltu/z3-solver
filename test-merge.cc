@@ -3,7 +3,7 @@
 using namespace z3;
 using namespace EXPR;
 
-
+/*
 void test(){
     // create a symbolic object
     SYMemObject *obj = new SYMemObject;
@@ -52,8 +52,10 @@ void test(){
     ExprPtr ugt_expr = std::make_shared<UgtExpr>(sub_expr);
     ExprPtr lnot_expr = std::make_shared<LNotExpr>(ugt_expr);
     LNotExpr *lnot = static_cast<LNotExpr*>(lnot_expr.get());
+    UgtExpr *ugt = static_cast<UgtExpr*>(ugt_expr.get());
     std::cout << "+++ Original Expression: \n" ;
-    lnot->print();
+    //lnot->print();
+    ugt->print();
     std::cout << "\n";
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
@@ -74,18 +76,18 @@ void test(){
     ExprPtr lnot_expr2 = std::make_shared<LNotExpr>(equal_expr1);
     LNotExpr *lnot1 = static_cast<LNotExpr*>(lnot_expr1.get());
     LNotExpr *lnot2 = static_cast<LNotExpr*>(lnot_expr2.get());
-    lnot1->print();
-    std::cout << "\n";
-    lnot2->print();
-    std::cout << "\n";
+    //lnot1->print();
+    //std::cout << "\n";
+    //lnot2->print();
+    //std::cout << "\n";
 
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(equal_expr);
-    constraints_test.insert(lnot_expr);
-    constraints_test.insert(lnot_expr1);
-    constraints_test.insert(lnot_expr2);
-    //constraints_test.insert(ugt_expr);
+    //constraints_test.insert(lnot_expr);
+    //constraints_test.insert(lnot_expr1);
+    //constraints_test.insert(lnot_expr2);
+    constraints_test.insert(ugt_expr);
 
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
@@ -100,12 +102,13 @@ void test(){
     std::vector<SYMemObject*> symobjts;
     std::vector<unsigned int> values;
     symobjts.push_back(obj);
-    symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
-    values.push_back(100);
-    values.push_back(1000);
+    //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
+    values.push_back(0);
+    //values.push_back(1000);
     bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, values, constraints_test);
     std::cout << "result of concritize : " << ret_con << std::endl;
 }
+*/
 void eval_example1() {
     std::cout << "eval example 1\n";
     context c;
@@ -126,7 +129,7 @@ void eval_example1() {
 }
 
 int main(){
-    test();
+    //test();
     //eval_example1();
     /*
     context c;
