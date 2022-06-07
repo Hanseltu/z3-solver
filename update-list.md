@@ -12,6 +12,6 @@
     * Lines 67 - 75 (the defintion of the function for handling those expressions)
 
 * `Z3Handler.cpp`
-    * Lines 232 - 279 (from `case Expr::Kind::Ult:{ ... }` to `case case Expr::Kind::Sge:{ ... }` in the function `Z3Handler::Z3HandlingExprPtr`)
+    * Lines 232 - 279 (from `case Expr::Kind::Ult:{ ... }` to `case Expr::Kind::Sge:{ ... }` in the function `Z3Handler::Z3HandlingExprPtr`)
     * Lines 487 - 542 (from the function `Z3Handler::Z3HandleUlt` to the function `Z3Handler::Z3HandleSge`)
 
