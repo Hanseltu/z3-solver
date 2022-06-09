@@ -18,10 +18,12 @@ typedef std::shared_ptr<KVExpr> KVExprPtr;
 using namespace EXPR;
 
 namespace Z3HANDLER {
+
 class Z3Handler{
 protected:
     z3::context& context_;
 public:
+    // z3::context& context_;
     //z3::context g_z3_context;
     //z3::solver g_solver(g_z3_context);
     Z3Handler();

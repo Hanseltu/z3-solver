@@ -48,13 +48,14 @@ void test(){
     ExprPtr sub_expr = std::make_shared<SubExpr>(const_expr2, extract_expr);
     ExprPtr sub_expr1 = std::make_shared<SubExpr>(const_expr3, extract_expr);
     //ExprPtr sub_expr = std::make_shared<SubExpr>(extract_expr, const_expr1);
-    ExprPtr ugt_expr = std::make_shared<UgtExpr>(sub_expr, const_expr1);
+    ExprPtr ugt_expr = std::make_shared<UgtExpr>(extract_expr, const_expr2);
+    //ExprPtr ugt_expr = std::make_shared<UgtExpr>(const_expr2, extract_expr);
     ExprPtr lnot_expr = std::make_shared<LNotExpr>(ugt_expr);
     LNotExpr *lnot = static_cast<LNotExpr*>(lnot_expr.get());
     UgtExpr *ugt = static_cast<UgtExpr*>(ugt_expr.get());
     std::cout << "+++ Original Expression: \n" ;
-    lnot->print();
-    //ugt->print();
+    //lnot->print();
+    ugt->print();
     std::cout << "\n";
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
@@ -68,25 +69,26 @@ void test(){
     ExprPtr equal_expr1 = std::make_shared<EqualExpr>(sub_expr1);
     EqualExpr *equal = static_cast<EqualExpr*>(equal_expr.get());
     //std::cout << "+++ Original Expression: \n" ;
-    equal->print();
+    //equal->print();
     std::cout << "\n";
     //g_solver.reset();
-    ExprPtr lnot_expr1 = std::make_shared<LNotExpr>(equal_expr);
+    ExprPtr lnot_expr1 = std::make_shared<LNotExpr>(equal_expr1);
     ExprPtr lnot_expr2 = std::make_shared<LNotExpr>(equal_expr1);
     LNotExpr *lnot1 = static_cast<LNotExpr*>(lnot_expr1.get());
     LNotExpr *lnot2 = static_cast<LNotExpr*>(lnot_expr2.get());
-    lnot1->print();
+    //lnot1->print();
     std::cout << "\n";
     //lnot2->print();
     //std::cout << "\n";
 
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
-    constraints_test.insert(equal_expr);
-    //constraints_test.insert(lnot_expr);
+    //constraints_test.insert(equal_expr1);
     //constraints_test.insert(lnot_expr1);
     //constraints_test.insert(lnot_expr2);
-    //constraints_test.insert(ugt_expr);
+
+    constraints_test.insert(ugt_expr);
+    //constraints_test.insert(lnot_expr);
 
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
@@ -97,6 +99,7 @@ void test(){
     }
 
     // testing concritize function
+    /*
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     std::vector<SYMemObject*> symobjts;
     std::vector<unsigned int> values;
@@ -106,6 +109,7 @@ void test(){
     //values.push_back(1000);
     bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, values, constraints_test);
     std::cout << "result of concritize : " << ret_con << std::endl;
+    */
 }
 void eval_example1() {
     std::cout << "eval example 1\n";
@@ -129,11 +133,11 @@ void eval_example1() {
 int main(){
     test();
     //eval_example1();
-    /*
     context c;
-    expr x = c.bv_const("x", 64);
+    expr x = c.bv_const("x", 32);
     solver s(c);
-    s.add(ugt(x,0));
+    expr zz = ugt(x, 2);
+    s.add(zz);
     std::cout << "solver : " << s  << s.check() << std::endl;
     std::cout << s.to_smt2() << std::endl;
     std::cout << "checking done ... " << std::endl;
@@ -146,6 +150,5 @@ int main(){
         assert(v.arity() == 0);
         std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
     }
-    */
     return 0;
 }
