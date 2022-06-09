@@ -49,7 +49,7 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
                     func_decl v = m[i];
                     // this problem contains only constants
                     assert(v.arity() == 0);
-                    //std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
+                    std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
                     ret.insert(std::pair<std::string, unsigned long long>(v.name().str(), m.get_const_interp(v).get_numeral_uint64()));
                 }
                 break;
@@ -381,22 +381,22 @@ z3::expr Z3Handler::Z3HandleAdd(ExprPtr r, ExprPtr l){ // 7
 }
 
 z3::expr Z3Handler::Z3HandleSub(ExprPtr r, ExprPtr l){
-    expr ret = (Z3HandlingExprPtr(l) - Z3HandlingExprPtr(r));
+    expr ret = (Z3HandlingExprPtr(r) - Z3HandlingExprPtr(l));
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleMul(ExprPtr r, ExprPtr l){
-    expr ret = Z3HandlingExprPtr(l) * Z3HandlingExprPtr(r);
+    expr ret = Z3HandlingExprPtr(r) * Z3HandlingExprPtr(l);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleUDiv(ExprPtr r, ExprPtr l){
-    expr ret = z3::udiv(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    expr ret = z3::udiv(Z3HandlingExprPtr(r), Z3HandlingExprPtr(l));
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSDiv(ExprPtr r, ExprPtr l){ // 11
-    expr ret = Z3HandlingExprPtr(l) / Z3HandlingExprPtr(r) ;
+    expr ret = Z3HandlingExprPtr(r) / Z3HandlingExprPtr(l) ;
     return ret;
 }
 
@@ -405,7 +405,7 @@ z3::expr Z3Handler::Z3HandleURem(){ // not defined in Expr.h
 }
 
 z3::expr Z3Handler::Z3HandleSRem(ExprPtr r, ExprPtr l){
-    expr ret = z3::srem(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    expr ret = z3::srem(Z3HandlingExprPtr(r), Z3HandlingExprPtr(l));
     return ret;
 }
 
@@ -432,32 +432,32 @@ z3::expr Z3Handler::Z3HandleNot(ExprPtr ptr){
 }
 
 z3::expr Z3Handler::Z3HandleAnd(ExprPtr r, ExprPtr l){
-    expr ret = Z3HandlingExprPtr(l) & Z3HandlingExprPtr(r);
+    expr ret = Z3HandlingExprPtr(r) & Z3HandlingExprPtr(l);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleOr(ExprPtr r, ExprPtr l){
-    expr ret = Z3HandlingExprPtr(l) | Z3HandlingExprPtr(r);
+    expr ret = Z3HandlingExprPtr(r) | Z3HandlingExprPtr(l);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleXor(ExprPtr r, ExprPtr l){
-    expr ret = Z3HandlingExprPtr(l) ^ Z3HandlingExprPtr(r);
+    expr ret = Z3HandlingExprPtr(r) ^ Z3HandlingExprPtr(l);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleShl(ExprPtr r, ExprPtr l){
-    expr ret = z3::shl(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    expr ret = z3::shl(Z3HandlingExprPtr(r), Z3HandlingExprPtr(l));
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleLShr(ExprPtr r, ExprPtr l){
-    expr ret = z3::lshr(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    expr ret = z3::lshr(Z3HandlingExprPtr(r), Z3HandlingExprPtr(l));
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleAShr(ExprPtr r, ExprPtr l){ // 21
-    expr ret = z3::ashr(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    expr ret = z3::ashr(Z3HandlingExprPtr(r), Z3HandlingExprPtr(l));
     return ret;
 }
 
@@ -487,21 +487,21 @@ z3::expr Z3Handler::Z3HandleDistinct(ExprPtr ptr){ // Should have two sub-expres
 z3::expr Z3Handler::Z3HandleUlt(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = z3::ult(x, y);
+    expr ret = z3::ult(y, x);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleUle(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = z3::ule(x, y);
+    expr ret = z3::ule(y, x);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleUgt(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = z3::ugt(x, y);
+    expr ret = z3::ugt(y, x);
     //expr ret =  (x > 0);
     return ret;
 }
@@ -509,35 +509,35 @@ z3::expr Z3Handler::Z3HandleUgt(ExprPtr r, ExprPtr l){
 z3::expr Z3Handler::Z3HandleUge(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = z3::uge(x, y);
+    expr ret = z3::uge(y, x);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSlt(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = (x < y);
+    expr ret = (y < x);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSle(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = (x <= y);
+    expr ret = (y <= x);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSgt(ExprPtr r, ExprPtr l){
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = (x > y);
+    expr ret = (y > x);
     return ret;
 }
 
 z3::expr Z3Handler::Z3HandleSge(ExprPtr r, ExprPtr l){ // 31
     expr x = Z3HandlingExprPtr(l);
     expr y = Z3HandlingExprPtr(r);
-    expr ret = (x >= y);
+    expr ret = (y >= x);
     return ret;
 }
 
@@ -592,7 +592,7 @@ z3::expr Z3Handler::Z3HandleNoOverflow(ExprPtr ptr){ // 41 // not sure how to wr
 }
 
 z3::expr Z3Handler::Z3HandleCombine(ExprPtr r, ExprPtr l){ // Is the same as Concat? This version does not consider the lsize and rsize
-    expr ret = z3::concat(Z3HandlingExprPtr(l), Z3HandlingExprPtr(r));
+    expr ret = z3::concat(Z3HandlingExprPtr(r), Z3HandlingExprPtr(l));
     return ret;
 }
 
