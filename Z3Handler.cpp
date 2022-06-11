@@ -77,7 +77,7 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
  * Output: a bool value : true/false
  *
 */
-bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector<unsigned int> values, std::set<KVExprPtr> constraints){
+bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::set<KVExprPtr> constraints){
     bool ret;
     //z3::solver Solver(context_);
     symObjectsMap.clear(); // reset map to be null
@@ -93,10 +93,10 @@ bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector
     std::cout << g_solver << std::endl;
     std::cout << "++++++++++++++" << std::endl;
 
-    if (symobjs.size() != values.size()) {
-        printf("\033[47;31m Z3 Handlering ERROR : The number of corresponding symbols and values under concritization is not the same! \033[0m\n");
-        exit(1); //shoud we just exit?
-    }
+    //if (symobjs.size() != values.size()) {
+    //    printf("\033[47;31m Z3 Handlering ERROR : The number of corresponding symbols and values under concritization is not the same! \033[0m\n");
+    //    exit(1); //shoud we just exit?
+    //}
     for (int i = 0; i < symobjs.size(); i++){
         // checking whether the input obj exists in the corrent constraints, raise an error if no;
         if (symObjectsMap.find(symobjs[i]) == symObjectsMap.end()) {
@@ -104,11 +104,96 @@ bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::vector
             //throw symobjs[i];
         }
         // otherwise, get the symbolic expr in Z3 and add the extra constraint
-        expr value_expr = context_.bv_val(values[i], 32); // any bad effects when it's 64-bit?
-        for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
-            if (it->first == symobjs[i]) {
-                expr sym_expr = it->second;
-                g_solver.add(sym_expr == value_expr);
+        // write constraints based on different size
+        switch (symobjs[i]->size){
+            case 1: { // 1 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i8, 1 * 8);
+                    //g_solver.add(symObjectsMap[symobjs[i]] == value_expr); // why this can not work? strange---
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u8, 1 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                break;
+            }
+            case 2: { // 2 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i16, 2 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u16, 2 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                break;
+            }
+            case 4: { // 4 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i32, 4 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u32, 4 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                break;
+            }
+            case 8: { // 8 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i64, 8 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u64, 8 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            g_solver.add(sym_expr == value_expr);
+                        }
+                    }
+                }
+                break;
+            }
+            default: {
+                printf("\033[47;31m Z3 Handlering ERROR : the concritized value has an unsupported size ! \033[0m\n");
+                break;
             }
         }
     }
@@ -330,6 +415,9 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
         }
         case Expr::Kind::Extract:{
             return Z3HandleExtract(ptr);
+        }
+        case Expr::Kind::CombineMultiExpr: {
+            ; //TODO to be added
         }
         default:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? No such type! \033[0m\n");
@@ -616,4 +704,20 @@ z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     // Finally, it should be 32-bit
     //return x.extract(e*8 - 1, s); // looks different with the existing implementation
     return x.extract(63,  32); // looks different with the existing implementation
+}
+
+
+z3::expr Z3HandleCombineMulti(std::vector<ExprPtr> exprs, std::vector<int> sizes){
+    // 1. check size first
+    if (exprs.size() != sizes.size()) {
+        printf("\033[47;31m Z3 Handlering ERROR : The number of ExprPtr (exprs) and size (sizes) is different ! \033[0m\n");
+        throw exprs;
+    }
+    // 2. extract
+    // 3. combine
+    //
+    int nu = 0;
+    for (; nu < exprs.size(); nu ++){
+       ;
+    }
 }

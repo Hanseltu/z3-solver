@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <stdio.h>
+#include <vector>
 
 #define EXPR_UNDEFINED   -1
 
@@ -46,17 +47,29 @@
 
 #define EXPR_Combine        42
 #define EXPR_Extract        43
+#define EXPR_CombineMulti 44
 
 
-
-struct SYMemObject {
+/* memory object specified by user */
+    struct SYMemObject {
         std::string name;  // name of object
         unsigned long long addr;        // memory address
-        unsigned long long size;        // size in bytes
-        // KVExprPtr expr;    // point to a KVExprPtr
+        unsigned long size;        // size in bytes
+        bool is_signed; // @THX specify unsigned/signed
+        //ExprPtr expr;    // point to a KVExprPtr
+        //concrete value of symbol
+        union {
+            int64_t i64;
+            int32_t i32;
+            int16_t i16;
+            int8_t i8;
+            uint64_t u64;
+            uint32_t u32;
+            uint16_t u16;
+            uint8_t u8;
+        };
         //SYMemObject() : expr(nullptr) {}
     };
-
 
 namespace EXPR {
 
@@ -115,7 +128,8 @@ class Expr {
 
         NoOverflow, //41
         Combine,
-        Extract
+        Extract,
+        CombineMultiExpr
 
     }; // end enum definition
 
@@ -599,6 +613,27 @@ class ExtractExpr : public UryExpr {
     int getStart(){ return s; }
     int getEnd(){ return e; }
 } ;
+
+class CombineMultiExpr :public Expr {
+    public:
+    std::vector <int> offsets ;
+    std::vector <int> sizes ;
+    std::vector <ExprPtr> exprs ;
+    // r is high bytes, l is low bytes.
+
+    CombineMultiExpr(std::vector <ExprPtr> e, std::vector <int> o, std::vector <int> s) :Expr()
+        {exprID = EXPR_CombineMulti; exprs=e; offsets=o; sizes=s;} ;
+
+    CombineMultiExpr(std::vector <ExprPtr> e, std::vector <int> o, std::vector <int> s, int sz, int off) : Expr(sz, off)
+        {exprID = EXPR_CombineMulti; exprs=e; offsets=o; sizes=s;}
+
+    virtual void print () ;
+
+    // @THX
+    Kind getKind() const { return Kind::CombineMultiExpr; }
+    std::vector<ExprPtr> getMultiExprPtr()  { return exprs; }
+    std::vector<int> getMultiSize() { return sizes; }
+};
 
 };  // namespace EXPR
 

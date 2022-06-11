@@ -99,17 +99,16 @@ void test(){
     }
 
     // testing concritize function
-    /*
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     std::vector<SYMemObject*> symobjts;
-    std::vector<unsigned int> values;
+    obj->i32 = 100;
+    symobjts.push_back(obj);
+    obj->i32 = 200;
     symobjts.push_back(obj);
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
-    values.push_back(0);
     //values.push_back(1000);
-    bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, values, constraints_test);
+    bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
     std::cout << "result of concritize : " << ret_con << std::endl;
-    */
 }
 void eval_example1() {
     std::cout << "eval example 1\n";
@@ -133,8 +132,12 @@ void eval_example1() {
 int main(){
     test();
     //eval_example1();
+    /*
     context c;
-    expr x = c.bv_const("x", 32);
+    expr x1 = c.bv_const("x", 8);
+    expr x2 = c.bv_const("x", 24);
+    expr x3 = c.bv_const("x", 32);
+    expr x = concat(concat(x1, x2), x3);
     solver s(c);
     expr zz = ugt(x, 2);
     s.add(zz);
@@ -150,5 +153,6 @@ int main(){
         assert(v.arity() == 0);
         std::cout << v.name() << " = " << m.get_const_interp(v) << "\n";
     }
+    */
     return 0;
 }
