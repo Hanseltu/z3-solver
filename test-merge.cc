@@ -8,7 +8,7 @@ void test(){
     VMState::SYMemObject *obj = new VMState::SYMemObject;
     VMState::SYMemObject *obj1 = new VMState::SYMemObject;
     obj->name = "niceval";
-    obj->size = 4;
+    obj->size = 8;
     UDefExpr *sym_expr = new UDefExpr(obj);
     // Z3HandleUND(sym)
     Z3HANDLER::Z3Handler *z3_handler = new Z3HANDLER::Z3Handler();
@@ -20,7 +20,7 @@ void test(){
     std::cout << "ret_udef : " << ret_udef << std::endl;
 
     //testing Const
-    ExprPtr const_expr = std::make_shared<ConstExpr>(0x01);
+    ExprPtr const_expr = std::make_shared<ConstExpr>(0x13);
     expr ret_const = z3_handler->Z3HandleConst(const_expr);
     std::cout << "ret_const : " << ret_const << std::endl;
 
@@ -30,21 +30,13 @@ void test(){
     std::cout << "ret_add : " << ret_add << std::endl;
     //expr con = ret_udef == ret_add;
 
-    //testing Sge
-    ExprPtr sge_expr = std::make_shared<SgeExpr>(add_expr, const_expr);
-    SgeExpr * sge = static_cast<SgeExpr*>(sge_expr.get());
-
-    std::cout << "+++ Original Expression: " ;
-    //sge->print();
-    std::cout << "\n";
-
     // testing LNot(Ugt(Sub(0x2, Extract(Combine(0x, which_rdi), 0, 4)))
     ExprPtr const_expr1 = std::make_shared<ConstExpr>(0x0);
     ExprPtr const_expr2 = std::make_shared<ConstExpr>(0x2);
     ExprPtr const_expr3 = std::make_shared<ConstExpr>(0x1);
     CombineExpr *combine = new CombineExpr(const_expr1, udef_expr, 0, 0);
     ExprPtr combine_expr = std::make_shared<CombineExpr>(udef_expr, const_expr1, 0, 0);
-    ExprPtr extract_expr = std::make_shared<ExtractExpr>(combine_expr, 0, 4);
+    ExprPtr extract_expr = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
     ExprPtr sub_expr = std::make_shared<SubExpr>(const_expr2, extract_expr);
     ExprPtr sub_expr1 = std::make_shared<SubExpr>(const_expr3, extract_expr);
     //ExprPtr sub_expr = std::make_shared<SubExpr>(extract_expr, const_expr1);
@@ -55,7 +47,7 @@ void test(){
     UgtExpr *ugt = static_cast<UgtExpr*>(ugt_expr.get());
     std::cout << "+++ Original Expression: \n" ;
     //lnot->print();
-    ugt->print();
+    //ugt->print();
     std::cout << "\n";
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
@@ -63,6 +55,12 @@ void test(){
     expr ret_sub = z3_handler->Z3HandleSub(extract_expr, const_expr2);
     //expr ret_solver = z3_handler->Z3HandlingExprPtr(lnot_expr);
 
+    //testing Sge
+    ExprPtr sge_expr = std::make_shared<SgeExpr>(extract_expr, const_expr);
+    SgeExpr * sge = static_cast<SgeExpr*>(sge_expr.get());
+    std::cout << "+++ Original Expression: " ;
+    sge->print();
+    std::cout << "\n";
     // testing Equal(And(Extract(Combine(0x, which_rdi), 0, 4), Extract(Combine(0x0, which_rdi), 0, 4)))
     ExprPtr and_expr = std::make_shared<AndExpr>(extract_expr, extract_expr);
     ExprPtr equal_expr = std::make_shared<EqualExpr>(and_expr);
@@ -80,16 +78,15 @@ void test(){
     std::cout << "\n";
     //lnot2->print();
     //std::cout << "\n";
-
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(equal_expr1);
     //constraints_test.insert(lnot_expr1);
     //constraints_test.insert(lnot_expr2);
 
-    constraints_test.insert(ugt_expr);
+    //constraints_test.insert(ugt_expr);
     //constraints_test.insert(lnot_expr);
-
+    constraints_test.insert(sge_expr);
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
     ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
@@ -101,9 +98,9 @@ void test(){
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     std::vector<VMState::SYMemObject*> symobjts;
-    obj->i32 = 100;
+    obj->i32 = 1;
     symobjts.push_back(obj);
-    obj->i32 = 200;
+    obj->i32 = 2;
     symobjts.push_back(obj);
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
     //values.push_back(1000);

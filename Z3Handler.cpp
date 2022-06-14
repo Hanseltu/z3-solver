@@ -712,7 +712,7 @@ z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     //std::cout << "start : " << s << std::endl;
     //std::cout << "end : " << e << std::endl;
     // Finally, it should be 32-bit
-    return x.extract(e*8 - 1 + 32, s+32); // looks different with the existing implementation
+    return x.extract(e*8 - 1, s); // looks different with the existing implementation
     //return x.extract(63,  32); // looks different with the existing implementation
 }
 

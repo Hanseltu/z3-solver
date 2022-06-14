@@ -213,6 +213,9 @@ class BinExpr : public Expr {
    public:
     void print () ;
 
+    ExprPtr getR() { return R; }
+    ExprPtr getL() { return L; }
+
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Bin; }
     ExprPtr getExprPtrR() { return R; }
