@@ -15,3 +15,14 @@
     * Lines 232 - 279 (from `case Expr::Kind::Ult:{ ... }` to `case Expr::Kind::Sge:{ ... }` in the function `Z3Handler::Z3HandlingExprPtr`)
     * Lines 487 - 542 (from the function `Z3Handler::Z3HandleUlt` to the function `Z3Handler::Z3HandleSge`)
 
+
+#### 20220614
+
+#### Remove Lines 53-75 in `Expr.h` and then use it to replace `Expr.h` in your own system
+
+    * Do a testing first to check if replaced `Expr.h` works well
+
+
+#### Replace `Z3Handler.cpp` and `Z3Handler.h`
+
+    * I have added the class definition of `SYMemObject` to `VMState::SYMemObject`, so there will no compiliation errors exist this time
