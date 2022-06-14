@@ -114,6 +114,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -123,6 +124,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -135,6 +137,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -144,6 +147,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -156,6 +160,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -165,6 +170,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -177,6 +183,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -186,6 +193,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             g_solver.add(sym_expr == value_expr);
+                            break;
                         }
                     }
                 }
@@ -417,7 +425,9 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return Z3HandleExtract(ptr);
         }
         case Expr::Kind::CombineMultiExpr: {
-            ; //TODO to be added
+            CombineMultiExpr * m_expr = static_cast<CombineMultiExpr*>(ptr.get());
+            std::vector<ExprPtr> exprs = m_expr->getMultiExprPtr();
+            return Z3HandleCombineMulti(exprs);
         }
         default:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? No such type! \033[0m\n");
