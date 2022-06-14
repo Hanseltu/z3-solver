@@ -5,8 +5,8 @@ using namespace EXPR;
 
 void test(){
     // create a symbolic object
-    SYMemObject *obj = new SYMemObject;
-    SYMemObject *obj1 = new SYMemObject;
+    VMState::SYMemObject *obj = new VMState::SYMemObject;
+    VMState::SYMemObject *obj1 = new VMState::SYMemObject;
     obj->name = "niceval";
     obj->size = 4;
     UDefExpr *sym_expr = new UDefExpr(obj);
@@ -100,7 +100,7 @@ void test(){
 
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
-    std::vector<SYMemObject*> symobjts;
+    std::vector<VMState::SYMemObject*> symobjts;
     obj->i32 = 100;
     symobjts.push_back(obj);
     obj->i32 = 200;

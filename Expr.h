@@ -51,6 +51,8 @@
 
 
 /* memory object specified by user */
+class VMState{
+    public:
     struct SYMemObject {
         std::string name;  // name of object
         unsigned long long addr;        // memory address
@@ -70,6 +72,7 @@
         };
         //SYMemObject() : expr(nullptr) {}
     };
+};
 
 namespace EXPR {
 
@@ -156,6 +159,7 @@ class Expr {
         //
         // @THX : add a function to get Kind
         virtual Kind getKind() const = 0;
+        int getExprSize() { return size; }
 
 };
 
@@ -180,7 +184,7 @@ class UDefExpr : public Expr {
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return UNDEFINED; }
-    SYMemObject * getObject() { return (SYMemObject*) O; }
+    VMState::SYMemObject * getObject() { return (VMState::SYMemObject*) O; }
 };
 
 class ConstExpr : public Expr {
@@ -351,7 +355,7 @@ class iRemExpr : public BinExpr {
 class UryExpr : public Expr {
    protected:
     ExprPtr E;
-    UryExpr(ExprPtr e) : E(e) {}
+    UryExpr(ExprPtr e) : E(e), Expr(e->size, 0) {}
     UryExpr(ExprPtr e, int sz, int off) : Expr(sz, off), E(e) {}
 
    public:
@@ -602,7 +606,7 @@ class CombineExpr :public BinExpr {
 class ExtractExpr : public UryExpr {
     public:
         int s, e;
-        ExtractExpr(ExprPtr expr, int start, int end) : UryExpr(expr) {exprID = EXPR_Extract;s=start; e=end;}
+        ExtractExpr(ExprPtr expr, int start, int end) : UryExpr(expr, end-start, 0) {exprID = EXPR_Extract;s=start; e=end;}
         ExtractExpr(ExprPtr expr, int start, int end, int sz, int off) : UryExpr(expr, sz, off) {exprID = EXPR_Extract;s=start; e=end;}
 
         virtual void print () ;
@@ -627,7 +631,7 @@ class CombineMultiExpr :public Expr {
     CombineMultiExpr(std::vector <ExprPtr> e, std::vector <int> o, std::vector <int> s, int sz, int off) : Expr(sz, off)
         {exprID = EXPR_CombineMulti; exprs=e; offsets=o; sizes=s;}
 
-    virtual void print () ;
+    //virtual void print () ;
 
     // @THX
     Kind getKind() const { return Kind::CombineMultiExpr; }

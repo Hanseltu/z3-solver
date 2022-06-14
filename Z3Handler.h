@@ -30,12 +30,12 @@ public:
     virtual ~Z3Handler();
 
     // a set to store symbolic objects
-    std::map<SYMemObject*, z3::expr> symObjectsMap;
+    std::map<VMState::SYMemObject*, z3::expr> symObjectsMap;
     // solver function
     std::map<std::string, unsigned long long> Z3SolveOne(std::set<KVExprPtr> constraints);
 
     // concritize function
-    bool Z3SolveConcritize(std::vector<SYMemObject*> symobjs,  std::set<KVExprPtr> constraints);
+    bool Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs,  std::set<KVExprPtr> constraints);
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
@@ -88,7 +88,7 @@ public:
     z3::expr Z3HandleNoOverflow(ExprPtr nooverflow_expr); // 41 // not sure how to write z3 expr
     z3::expr Z3HandleCombine(ExprPtr r, ExprPtr l);  // ?lsize? rsize?
     z3::expr Z3HandleExtract(ExprPtr ptr); // need to return size as well
-    z3::expr Z3HandleCombineMulti(std::vector<ExprPtr> exprs, std::vector<int> sizes);
+    z3::expr Z3HandleCombineMulti(std::vector<ExprPtr> exprs);
 
 };
 } // end of namespace

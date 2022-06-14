@@ -77,7 +77,7 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
  * Output: a bool value : true/false
  *
 */
-bool Z3Handler::Z3SolveConcritize(std::vector<SYMemObject*> symobjs, std::set<KVExprPtr> constraints){
+bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, std::set<KVExprPtr> constraints){
     bool ret;
     //z3::solver Solver(context_);
     symObjectsMap.clear(); // reset map to be null
@@ -433,11 +433,11 @@ z3::expr Z3Handler::Z3HandleUND(ExprPtr udef_expr_ptr){
         printf("\033[47;31m Z3 Handlering ERROR : UDefExpr \033[0m\n");
         throw udef_expr;
     }
-    SYMemObject *obj = udef_expr->getObject();
+    VMState::SYMemObject *obj = udef_expr->getObject();
     std::string sym_name = obj->name;
     unsigned long long size = obj->size;
     expr x = context_.bv_const(sym_name.c_str(), size*8);
-    symObjectsMap.insert(std::pair<SYMemObject*, z3::expr>(obj, x));
+    symObjectsMap.insert(std::pair<VMState::SYMemObject*, z3::expr>(obj, x));
     return x;
 }
 
@@ -702,22 +702,30 @@ z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     //std::cout << "start : " << s << std::endl;
     //std::cout << "end : " << e << std::endl;
     // Finally, it should be 32-bit
-    //return x.extract(e*8 - 1, s); // looks different with the existing implementation
-    return x.extract(63,  32); // looks different with the existing implementation
+    return x.extract(e*8 - 1 + 32, s+32); // looks different with the existing implementation
+    //return x.extract(63,  32); // looks different with the existing implementation
 }
 
 
-z3::expr Z3HandleCombineMulti(std::vector<ExprPtr> exprs, std::vector<int> sizes){
-    // 1. check size first
-    if (exprs.size() != sizes.size()) {
-        printf("\033[47;31m Z3 Handlering ERROR : The number of ExprPtr (exprs) and size (sizes) is different ! \033[0m\n");
+z3::expr Z3Handler::Z3HandleCombineMulti(std::vector<ExprPtr> exprs){
+    // check input size
+    int vec_size = exprs.size();
+    if (vec_size == 0 || vec_size < 2 ){
+        printf("\033[47;31m Z3 Handlering ERROR : CombineMultiExpr Failed (the vector size is not appliable for combining) \033[0m\n");
         throw exprs;
     }
-    // 2. extract
-    // 3. combine
-    //
-    int nu = 0;
-    for (; nu < exprs.size(); nu ++){
-       ;
+    // check ExprPtr size
+    for (int i = 0 ; i < exprs.size(); i++){
+        int expr_size = exprs[i]->getExprSize();
+        if (expr_size > 8 || expr_size < 0)
+            printf("\033[47;31m Z3 Handlering ERROR : CombineMultiExpr Failed (the size of ExprPtr is < 0 or > 8) \033[0m\n");
     }
+    expr combmulti_expr = Z3HandlingExprPtr(exprs[0]);
+    int nu = 1;
+    for (; nu < exprs.size(); nu ++){
+        combmulti_expr = z3::concat(combmulti_expr, Z3HandlingExprPtr(exprs[nu]));
+        if (nu == exprs.size() - 1)
+           break;
+    }
+    return combmulti_expr;
 }

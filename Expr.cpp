@@ -48,7 +48,7 @@ static char exprName[][16] = {"","","","","","","",
 
 void UDefExpr::print () {
     //VMState::SYMemObject *obj = (VMState::SYMemObject *) O;
-    SYMemObject *obj = (SYMemObject *) O;
+    VMState::SYMemObject *obj = (VMState::SYMemObject *) O;
     if(obj != NULL )
         std::cout << obj->name ;
     else
