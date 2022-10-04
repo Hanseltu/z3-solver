@@ -3,10 +3,18 @@
 using namespace z3;
 using namespace EXPR;
 
+static __attribute__ ((noinline)) unsigned long long rdtsc(void){
+    unsigned hi, lo;
+    asm volatile ("rdtsc" : "=a"(lo), "=d"(hi));
+    return ((unsigned long long) lo | ((unsigned long long) hi << 32));
+}
+
 void test(){
     // create a symbolic object
     VMState::SYMemObject *obj = new VMState::SYMemObject;
     VMState::SYMemObject *obj1 = new VMState::SYMemObject;
+    obj1->size = 8;
+    obj->has_seed = 1;
     obj->name = "niceval";
     obj->size = 8;
     UDefExpr *sym_expr = new UDefExpr(obj);
@@ -81,7 +89,7 @@ void test(){
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(equal_expr1);
-    //constraints_test.insert(lnot_expr1);
+    constraints_test.insert(lnot_expr1);
     //constraints_test.insert(lnot_expr2);
 
     //constraints_test.insert(ugt_expr);
@@ -89,45 +97,101 @@ void test(){
     constraints_test.insert(sge_expr);
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
+    unsigned long long time_start_solve = rdtsc();
     ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
+    unsigned long long time_end_solve = rdtsc();
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << std::endl;
         printf("value : %llu(dec) %x(hex) \n", it->second, (unsigned int) it->second);
     }
-
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     std::vector<VMState::SYMemObject*> symobjts;
-    obj->i32 = 1;
+    //obj->i32 = 1;
+    //symobjts.push_back(obj);
+    obj->i32 = 20;
     symobjts.push_back(obj);
-    obj->i32 = 2;
-    symobjts.push_back(obj);
+    //symobjts.push_back(obj1);
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
     //values.push_back(1000);
+    unsigned long long time_start_concritize = rdtsc();
     bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
     std::cout << "result of concritize : " << ret_con << std::endl;
+    unsigned long long time_end_concritize = rdtsc();
+    std::cout << "Time for Z3SolveOne : " << time_end_solve - time_start_solve << std::endl;
+    std::cout << "Time for Z3SolveConcritize : " << time_end_concritize - time_start_concritize << std::endl;
 }
 void eval_example1() {
     std::cout << "eval example 1\n";
     context c;
     expr x = c.int_const("x");
     expr y = c.int_const("y");
-    solver s(c);
+    solver s1(c);
 
-    /* assert x < y */
-    s.add(x < y);
-    /* assert x > 2 */
-    s.add(x > 2);
+    s1.add(x > 5);
+    s1.add(x == 100);
 
-    std::cout << s.check() << "\n";
+    unsigned long long start1 = rdtsc();
+    std::cout << s1.check() << "\n";
+    unsigned long long end1 = rdtsc();
+    std::cout << "Time for normal Z3 (solver.check()) : " << end1 - start1  << std::endl;
 
+    solver s2(c);
+    unsigned long long start2 = rdtsc();
+    //s2.add(100>5);
+    y = x > 5 && x == 100;
+    //y.simplify();
+    s2.add(y);
+    s2.check();
+    //model m = s2.get_model();
+    //s2.get_model().eval(y);
+    unsigned long long end2 = rdtsc();
+    std::cout << "Time for normal Z3 (check): " << end2 - start2  << std::endl;
+
+
+    /*
     model m = s.get_model();
     std::cout << "Model:\n" << m << "\n";
     std::cout << "x+y = " << m.eval(x+y) << "\n";
+    */
 }
+
+
+void substitute_example() {
+    std::cout << "substitute example\n";
+    context c;
+    expr x(c);
+    x = c.int_const("x");
+    expr f(c);
+    //f = (x == 2) || (x == 1);
+    f = (x > 5);
+    std::cout << f << std::endl;
+    std::cout << f.is_true() << std::endl;
+
+    expr two(c), three(c);
+    two   = c.int_const("x");
+    three = c.int_val(10);
+    Z3_ast from[] = { two };
+    Z3_ast to[]   = { three };
+    expr new_f(c);
+    unsigned long long start = rdtsc();
+    new_f = to_expr(c, Z3_substitute(c, f, 1, from, to));
+    unsigned long long end = rdtsc();
+    std::cout << new_f << std::endl;
+    std::cout << new_f.simplify().is_true() << std::endl;
+    std::cout << "Time for normal Z3 (in substitute): " << end - start  << std::endl;
+}
+
 
 int main(){
     test();
+    //unsigned long long start = rdtsc();
+    //eval_example1();
+    //substitute_example();
+    //unsigned long long end = rdtsc();
+    //std::cout << "Time for normal Z3 : " << end - start  << std::endl;
+
+    //std::cout << "/////////////////" << std::endl;
     //eval_example1();
     /*
     context c;

@@ -58,6 +58,7 @@ class VMState{
         unsigned long long addr;        // memory address
         unsigned long size;        // size in bytes
         bool is_signed; // @THX specify unsigned/signed
+        bool has_seed; // for specifing the seed mode @pansilu
         //ExprPtr expr;    // point to a KVExprPtr
         //concrete value of symbol
         union {

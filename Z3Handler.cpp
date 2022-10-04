@@ -40,7 +40,7 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
         g_solver.add(expr_temp);
     }
     //g_solver.add(exprs);
-    std::cout << "solver: " << g_solver <<  std::endl;
+    //std::cout << "solver: " << g_solver <<  std::endl;
     // produce .smt2 file which can be used in other solvers
     //std::cout << "smt2 :" << g_solver.to_smt2() << "\n done" << std::endl;
     switch (g_solver.check()){
@@ -72,48 +72,61 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
 }
 
 /*
- * Function: check whether a constraint can be true when concritizing a symbolic variable
- * Input: 1) Symbolic object defined in SYMemObject*; 2)the concrete value; 3) a set of constraints
+ * Function: check whether a constraint (expression) can be true when concritizing a single symbolic variable using Z3 expr
+ * Input: 1) expr to be checked; 2) symbolic expr; 3) concrete expr to be substituted for symbolic expr
  * Output: a bool value : true/false
  *
 */
-bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, std::set<KVExprPtr> constraints){
-    bool ret;
-    //z3::solver Solver(context_);
-    symObjectsMap.clear(); // reset map to be null
-    //z3::solver g_solver(g_z3_context);
-    z3::solver g_solver(context_);
-    g_solver.reset();
+bool Z3Handler::Z3ExpressionEvaluator(expr org_expr, expr sym_expr, expr con_expr){
+    expr before_substitute(context_), after_substitute(context_);
+    before_substitute = sym_expr;
+    after_substitute = con_expr;
+    Z3_ast from[] = { before_substitute };
+    Z3_ast to [] = { after_substitute };
+    expr new_expr(context_);
+    new_expr = to_expr(context_, Z3_substitute(context_, org_expr, 1, from, to));
+    return new_expr.simplify().is_true();
+}
+
+/*
+ * Function: check whether a constraint can be true when concritizing a symbolic variable
+ * Input: 1) Symbolic objects defined in SYMemObject*, which includes their concrete values; 2) a set of constraints
+ * Output: a bool value : true/false
+ *
+*/
+bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all, std::set<KVExprPtr> constraints){
+    bool ret = 0;
     expr exprs = context_.bool_val(1);
     for (auto it = constraints.begin(); it != constraints.end(); it++){
         exprs = exprs & Z3HandlingExprPtr(*it);
     }
-    g_solver.add(exprs);
-    std::cout << "checking sat/unsat before concritization: " << g_solver.check() << std::endl;
-    std::cout << g_solver << std::endl;
-    std::cout << "++++++++++++++" << std::endl;
-
-    //if (symobjs.size() != values.size()) {
-    //    printf("\033[47;31m Z3 Handlering ERROR : The number of corresponding symbols and values under concritization is not the same! \033[0m\n");
-    //    exit(1); //shoud we just exit?
-    //}
+    // Filter the symbolic variables that are not marked with seed
+    std::vector<VMState::SYMemObject*> symobjs; // symbolic variables in the seed mode
+    for (auto symobj : symobjs_all) {
+        if (symobj->has_seed == true)
+            symobjs.push_back(symobj);
+    }
+    if (symobjs.size() != symObjectsMap.size()){
+        // TODO for further use of the constraints: e.g., partially concritiize the symbolic variables
+        printf("\033[47;31m To be explored: the number of symbolic variables to be concretized are not the same as the ones in the constraints \033[0m\n");
+        exit(1);
+    }
+    // the following are for expression evaluator
     for (int i = 0; i < symobjs.size(); i++){
         // checking whether the input obj exists in the corrent constraints, raise an error if no;
         if (symObjectsMap.find(symobjs[i]) == symObjectsMap.end()) {
             printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
-            //throw symobjs[i];
         }
-        // otherwise, get the symbolic expr in Z3 and add the extra constraint
-        // write constraints based on different size
+        // otherwise, evaluate the expression and let it return true/false
+        // evaluate the expression based on different object size
         switch (symobjs[i]->size){
             case 1: { // 1 bytes
                 if (symobjs[i]->is_signed) {
                     expr value_expr = context_.bv_val(symobjs[i]->i8, 1 * 8);
-                    //g_solver.add(symObjectsMap[symobjs[i]] == value_expr); // why this can not work? strange---
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -123,7 +136,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -136,7 +149,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -146,7 +159,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -159,7 +172,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -169,7 +182,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -179,10 +192,11 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
             case 8: { // 8 bytes
                 if (symobjs[i]->is_signed) {
                     expr value_expr = context_.bv_val(symobjs[i]->i64, 8 * 8);
+                    std::cout << "value : " << symobjs[i]->i64 << std::endl;
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -192,7 +206,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
                     for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
-                            g_solver.add(sym_expr == value_expr);
+                            ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
                             break;
                         }
                     }
@@ -205,14 +219,6 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs, st
             }
         }
     }
-    std::cout << "checking sat/unsat after concritization: " << g_solver.check() << std::endl;
-    std::cout << g_solver << std::endl;
-    // produce .smt2 file which can be used in other solvers
-    //std::cout << "smt2 :" << g_solver.to_smt2() << "\n done" << std::endl;
-    if (g_solver.check() == sat)
-        ret = true;
-    else
-        ret = false;
     return ret;
 }
 
