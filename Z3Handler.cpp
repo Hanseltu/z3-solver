@@ -394,8 +394,7 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return ex; // TODO need to confirm further
         }
         case Expr::Kind::SignEXT:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
-            throw ptr;
+            return Z3HandleSignExt(ptr);
         }
         case Expr::Kind::ZeroEXT:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? \033[0m\n");
@@ -674,7 +673,9 @@ z3::expr Z3Handler::Z3HandleLNot(ExprPtr ptr){
 }
 
 z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){ // not sure how to write z3 expr
-    return context_.bv_val(100, 64);
+    expr x = Z3HandlingExprPtr(ptr);
+    int size = ptr->getExprSize();
+    return z3::sext(x, 2*size);  //TODO just double the size, please make sure
 }
 
 z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){ // not sure how to write z3 expr
