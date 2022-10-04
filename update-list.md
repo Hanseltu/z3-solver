@@ -38,3 +38,4 @@
 * Replace the body of the function `Z3SolveConcritize` implemented in Lines 98-222 in `Z3Handler.cpp`
 
    *Note that the line number and source file mentioned above are in this repository, you may need to find those files in the `KRover`'s implementation when conducting the merging.*
+* https://github.com/Hanseltu/z3-solver/commit/90ca8388d6ff8a528c9c84f047e995f2057129c4
