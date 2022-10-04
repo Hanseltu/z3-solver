@@ -26,3 +26,15 @@
 * Replace `Z3Handler.cpp` and `Z3Handler.h`
 
     * I have added the class definition of `SYMemObject` to `VMState::SYMemObject`, so there will no compiliation errors exist this time
+
+
+#### 20221004
+
+* Add the one new function definition in Line 38 in `Z3Handler.h`
+   * the function `bool Z3ExpressionEvaluator(z3::expr org_expr, z3::expr, z3::expr);`
+
+* Add the function implemented in Lines 74-89 in `Z3Handler.cpp`
+
+* Replace the body of the function `Z3SolveConcritize` implemented in Lines 98-222 in `Z3Handler.cpp`
+
+   *Note that the line number and source file mentioned above are in this repository, you may need to find those files in the `KRover`'s implementation when conducting the merging.*
