@@ -45,7 +45,10 @@ void test(){
     CombineExpr *combine = new CombineExpr(const_expr1, udef_expr, 0, 0);
     ExprPtr combine_expr = std::make_shared<CombineExpr>(udef_expr, const_expr1, 0, 0);
     ExprPtr extract_expr = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
-    ExprPtr sub_expr = std::make_shared<SubExpr>(const_expr2, extract_expr);
+    ExprPtr signext_expr = std::make_shared<SignExtExpr>(extract_expr);
+    //ExprPtr sub_expr = std::make_shared<SubExpr>(const_expr1, extract_expr);
+    ExprPtr sub_expr = std::make_shared<SubExpr>(const_expr1, signext_expr);
+    ExprPtr equal_expr_test = std::make_shared<EqualExpr>(sub_expr);
     ExprPtr sub_expr1 = std::make_shared<SubExpr>(const_expr3, extract_expr);
     //ExprPtr sub_expr = std::make_shared<SubExpr>(extract_expr, const_expr1);
     ExprPtr ugt_expr = std::make_shared<UgtExpr>(extract_expr, const_expr2);
@@ -54,6 +57,8 @@ void test(){
     LNotExpr *lnot = static_cast<LNotExpr*>(lnot_expr.get());
     UgtExpr *ugt = static_cast<UgtExpr*>(ugt_expr.get());
     std::cout << "+++ Original Expression: \n" ;
+    equal_expr_test->print();
+    //sub_expr->print();
     //lnot->print();
     //ugt->print();
     std::cout << "\n";
@@ -66,8 +71,8 @@ void test(){
     //testing Sge
     ExprPtr sge_expr = std::make_shared<SgeExpr>(extract_expr, const_expr);
     SgeExpr * sge = static_cast<SgeExpr*>(sge_expr.get());
-    std::cout << "+++ Original Expression: " ;
-    sge->print();
+    //std::cout << "+++ Original Expression: " ;
+    //sge->print();
     std::cout << "\n";
     // testing Equal(And(Extract(Combine(0x, which_rdi), 0, 4), Extract(Combine(0x0, which_rdi), 0, 4)))
     ExprPtr and_expr = std::make_shared<AndExpr>(extract_expr, extract_expr);
@@ -89,12 +94,12 @@ void test(){
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(equal_expr1);
-    constraints_test.insert(lnot_expr1);
+    //constraints_test.insert(lnot_expr1);
     //constraints_test.insert(lnot_expr2);
 
     //constraints_test.insert(ugt_expr);
     //constraints_test.insert(lnot_expr);
-    constraints_test.insert(sge_expr);
+    constraints_test.insert(equal_expr_test);
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
     unsigned long long time_start_solve = rdtsc();

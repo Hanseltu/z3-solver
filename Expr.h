@@ -407,7 +407,7 @@ class SignExtExpr : public UryExpr {
     SignExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_SignEXT;}
 
     // @THX add the implemenation of the virtual function
-    Kind getKind() const { return Sign; }
+    Kind getKind() const { return SignEXT; }
     ExprPtr getExprPtr() { return E; }
 };
 
