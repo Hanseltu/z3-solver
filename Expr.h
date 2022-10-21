@@ -202,6 +202,7 @@ class ConstExpr : public Expr {
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Const; }
     uint64_t getValue() { return V; }
+    int getSize() {return size;}
 };
 
 class BinExpr : public Expr {

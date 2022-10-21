@@ -97,9 +97,15 @@ bool Z3Handler::Z3ExpressionEvaluator(expr org_expr, expr sym_expr, expr con_exp
 bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all, std::set<KVExprPtr> constraints){
     bool ret = 0;
     expr exprs = context_.bool_val(1);
+    std::cout << "in Z3SolveConcritize" << std::endl;
+    for (auto i : constraints){
+        i->print();
+        printf("\n");
+    }
     for (auto it = constraints.begin(); it != constraints.end(); it++){
         exprs = exprs & Z3HandlingExprPtr(*it);
     }
+    std::cout << "exprs : " << exprs << std::endl;
     // Filter the symbolic variables that are not marked with seed
     std::vector<VMState::SYMemObject*> symobjs; // symbolic variables in the seed mode
     for (auto symobj : symobjs_all) {
@@ -224,7 +230,7 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all
 
 z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
     int kind = ptr->getKind();
-
+    std::cout << "Handling : " << kind << std::endl;
     switch (kind){
         case Expr::Kind::UNDEFINED:{ // -1
             //std::cout << "Handling " << kind << std::endl;
@@ -465,7 +471,8 @@ z3::expr Z3Handler::Z3HandleConst(ExprPtr const_expr_ptr){ // 3
     }
     uint64_t value = const_expr->getValue();
     //std::cout << "value in ConstExpr : " << value << std::endl;
-    expr x = context_.bv_val(value, 32);
+    int size = const_expr->getSize();
+    expr x = context_.bv_val(value, size * 8);
     return x;
 }
 
@@ -683,7 +690,7 @@ z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){ // not sure how to write z3 ex
     int size = ptr->getExprSize();
     printf("size in SignEXT : %d\n", size);
     std::cout << x << std::endl;
-    return z3::sext(x, 2*size * 8 );  //TODO just double the size, please make sure
+    return z3::sext(x, 64 );  //TODO just double the size, please make sure
     //expr ret = z3::sext(x, 0 );  //TODO just double the size, please make sure
     //std::cout << "ret : " << ret << std::endl;
     //return ret;
@@ -755,5 +762,6 @@ z3::expr Z3Handler::Z3HandleCombineMulti(std::vector<ExprPtr> exprs){
         if (nu == exprs.size() - 1)
            break;
     }
+    std::cout << "combmulti_expr: " << combmulti_expr << std::endl;
     return combmulti_expr;
 }

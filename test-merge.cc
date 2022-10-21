@@ -31,7 +31,6 @@ void test(){
     ExprPtr const_expr = std::make_shared<ConstExpr>(0x13);
     expr ret_const = z3_handler->Z3HandleConst(const_expr);
     std::cout << "ret_const : " << ret_const << std::endl;
-
     //testing Add
     ExprPtr add_expr = std::make_shared<AddExpr>(const_expr, const_expr);
     expr ret_add =  z3_handler->Z3HandleAdd(const_expr, const_expr);
@@ -62,12 +61,42 @@ void test(){
     //lnot->print();
     //ugt->print();
     std::cout << "\n";
+    // testing CombineMulti
+    ExprPtr const_expr00 = std::make_shared<ConstExpr>(0x1);
+    const_expr00->size = 8;
+    ExprPtr const_expr11 = std::make_shared<ConstExpr>(0x1);
+    const_expr11->size = 4;
+    ExprPtr const_expr22 = std::make_shared<ConstExpr>(0x1);
+    const_expr22->size = 1;
+    ExprPtr const_expr33 = std::make_shared<ConstExpr>(0x1);
+    const_expr33->size = 1;
+    ExprPtr const_expr44 = std::make_shared<ConstExpr>(0x1);
+    const_expr44->size = 1;
+    ExprPtr const_expr55 = std::make_shared<ConstExpr>(0x1);
+    const_expr55->size = 1;
+    std::vector<ExprPtr> e;
+    e.push_back(const_expr11);
+    e.push_back(const_expr22);
+    e.push_back(const_expr33);
+    e.push_back(const_expr44);
+    e.push_back(const_expr55);
+    std::vector<int> o;
+    o.push_back(4);
+    o.push_back(2);
+    o.push_back(2);
+    ExprPtr multicombine_expr = std::make_shared<CombineMultiExpr>(e, o, o);
+    multicombine_expr->print();
+    ExprPtr ult_expr = std::make_shared<UltExpr>(multicombine_expr, const_expr00);
+    expr multicombine_expr_z3 = z3_handler->Z3HandleCombineMulti(e);
+    expr const_expr00_z3 = z3_handler->Z3HandleConst(const_expr00);
+    expr test_expr = multicombine_expr_z3 - const_expr00_z3;
+    std::cout << "test_expr:" << test_expr << std::endl;
+    /*
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
     //std::cout << "ret_extract length : " << ret_extract.get_sort() << std::endl;
     expr ret_sub = z3_handler->Z3HandleSub(extract_expr, const_expr2);
     //expr ret_solver = z3_handler->Z3HandlingExprPtr(lnot_expr);
-
     //testing Sge
     ExprPtr sge_expr = std::make_shared<SgeExpr>(extract_expr, const_expr);
     SgeExpr * sge = static_cast<SgeExpr*>(sge_expr.get());
@@ -93,22 +122,24 @@ void test(){
     //std::cout << "\n";
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
     std::set<KVExprPtr> constraints_test;
-    //constraints_test.insert(equal_expr1);
+    constraints_test.insert(equal_expr1);
     //constraints_test.insert(lnot_expr1);
     //constraints_test.insert(lnot_expr2);
 
     //constraints_test.insert(ugt_expr);
     //constraints_test.insert(lnot_expr);
-    constraints_test.insert(equal_expr_test);
+    //constraints_test.insert(equal_expr_test);
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
     unsigned long long time_start_solve = rdtsc();
-    ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
+    //ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
     unsigned long long time_end_solve = rdtsc();
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << std::endl;
         printf("value : %llu(dec) %x(hex) \n", it->second, (unsigned int) it->second);
     }
+    */
+    /*
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     std::vector<VMState::SYMemObject*> symobjts;
@@ -125,6 +156,7 @@ void test(){
     unsigned long long time_end_concritize = rdtsc();
     std::cout << "Time for Z3SolveOne : " << time_end_solve - time_start_solve << std::endl;
     std::cout << "Time for Z3SolveConcritize : " << time_end_concritize - time_start_concritize << std::endl;
+    */
 }
 void eval_example1() {
     std::cout << "eval example 1\n";
