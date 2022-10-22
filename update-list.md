@@ -39,3 +39,12 @@
 
    *Note that the line number and source file mentioned above are in this repository, you may need to find those files in the `KRover`'s implementation when conducting the merging.*
 * https://github.com/Hanseltu/z3-solver/commit/90ca8388d6ff8a528c9c84f047e995f2057129c4
+
+
+#### 20221022
+
+* Insert one function (`int getSize() {return size;}`) in Line 205 in `Expr.h`
+* Modify the size implementation in `Z3Handler::Z3HandleConst` in Lines 474-475 in `Z3Handler.cpp`
+* (or check the commit here: https://github.com/Hanseltu/z3-solver/commit/59605d5fbb19ddaf70a68ad29b5a765ebf9b24e3#diff-29840bbe7222209931da38349f5098b73977e4caa744aa48185540693296c636R205 : please ignore other changes as they only for debug purpose)
+
+
