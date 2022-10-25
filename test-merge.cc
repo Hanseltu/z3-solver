@@ -61,7 +61,17 @@ void test(){
     //lnot->print();
     //ugt->print();
     std::cout << "\n";
+    // test SignExpr/NoSignExpr
+
+    ExprPtr const_expr00 = std::make_shared<ConstExpr>(0xfffffffffffffffe);
+    const_expr00->size = 8;
+    ExprPtr const_expr11 = std::make_shared<ConstExpr>(0x2);
+    const_expr11->size = 8;
+    ExprPtr sign_expr = std::make_shared<SignExpr>(const_expr00);
+    expr sign_expr_z3 = z3_handler->Z3HandleSign(sign_expr);
+    std:: cout << "sign_expr : " << sign_expr_z3 << std::endl;
     // testing CombineMulti
+    /*
     ExprPtr const_expr00 = std::make_shared<ConstExpr>(0x1);
     const_expr00->size = 8;
     ExprPtr const_expr11 = std::make_shared<ConstExpr>(0x1);
@@ -91,6 +101,7 @@ void test(){
     expr const_expr00_z3 = z3_handler->Z3HandleConst(const_expr00);
     expr test_expr = multicombine_expr_z3 - const_expr00_z3;
     std::cout << "test_expr:" << test_expr << std::endl;
+    */
     /*
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);

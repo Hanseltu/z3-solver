@@ -705,11 +705,44 @@ z3::expr Z3Handler::Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l){  // not sure 
 }
 
 z3::expr Z3Handler::Z3HandleSign(ExprPtr ptr){ // not sure how to write z3 expr
-    return context_.bv_val(100, 64);
+    SignExpr *sign_expr = static_cast<SignExpr*>(ptr.get());
+    if (sign_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : SignExpr \033[0m\n");
+        throw sign_expr;
+    }
+    expr x = Z3HandlingExprPtr(sign_expr->getExprPtr());
+    std::cout << "before sign : " << x << std::endl;
+    // general idea: get the highest byte first, and then check the sign/unsign
+    int size = sign_expr->getSize();
+    std::cout << "size from Z3HandleSign : " << size << std::endl;
+    expr sign_bit = x.extract(size * 8 - 1, size  * 8 - 1);
+    std::cout << "sign_bit : " << sign_bit.simplify() << std::endl;
+    expr bool_true = context_.bv_val(1, 1);
+    expr bool_false = context_.bv_val(0, 1);
+    std::cout << "bool_true : " << bool_true << std::endl;
+    std::cout << "bool_false : " << bool_false << std::endl;
+    if (bool_true == sign_bit.simplify()) // TODO not the correct way to compare two expressions
+        return bool_true; //TODO the size of return value may be wrong; I am not sure what expressions are supposed to be combined with SignExpr
+    else
+        return bool_false;
 }
 
 z3::expr Z3Handler::Z3HandleNoSign(ExprPtr ptr){ // not sure how to write z3 expr
-    return context_.bv_val(100, 64);
+    NoSignExpr *nosign_expr = static_cast<NoSignExpr*>(ptr.get());
+    if (nosign_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : NoSignExpr \033[0m\n");
+        throw nosign_expr;
+    }
+    expr x = Z3HandlingExprPtr(nosign_expr->getExprPtr());
+    // general idea: get the highest byte first, and then check the sign/unsign
+    int size = nosign_expr->getSize();
+    expr nosign_bit = x.extract(size * 8 - 1, size * 8 - 1);
+    expr bool_true = context_.bv_val(1, 1);
+    expr bool_false = context_.bv_val(0, 1);
+    if (bool_false == nosign_bit.simplify())
+        return bool_true;
+    else
+        return bool_false;
 }
 
 z3::expr Z3Handler::Z3HandleOverflow(ExprPtr ptr){ // not sure how to write z3 expr
@@ -737,7 +770,7 @@ z3::expr Z3Handler::Z3HandleExtract(ExprPtr ptr){
     //std::cout << "start : " << s << std::endl;
     //std::cout << "end : " << e << std::endl;
     // Finally, it should be 32-bit
-    return x.extract(e*8 - 1, s); // looks different with the existing implementation
+    return x.extract(e*8 - 1, s * 8); // looks different with the existing implementation
     //return x.extract(63,  32); // looks different with the existing implementation
 }
 

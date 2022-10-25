@@ -538,6 +538,7 @@ class SignExpr : public UryExpr {
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return Sign; }
     ExprPtr getExprPtr() { return E; }
+    int getSize() {return size;}
 } ;
 
 class NoSignExpr : public UryExpr {
@@ -548,6 +549,7 @@ class NoSignExpr : public UryExpr {
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return NoSign; }
     ExprPtr getExprPtr() { return E; }
+    int getSize() {return size;}
 } ;
 class OverflowExpr : public UryExpr {
     public:
