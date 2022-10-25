@@ -412,12 +412,10 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             throw ptr;
         }
         case Expr::Kind::Sign:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? Sign \033[0m\n");
-            throw ptr;
+            return Z3HandleSign(ptr);
         }
         case Expr::Kind::NoSign:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? NoSign \033[0m\n");
-            throw ptr;
+            return Z3HandleNoSign(ptr);
         }
         case Expr::Kind::Overflow:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? Overflow \033[0m\n");
