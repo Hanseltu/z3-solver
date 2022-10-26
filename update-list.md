@@ -47,4 +47,12 @@
 * Modify the size implementation in `Z3Handler::Z3HandleConst` in Lines 474-475 in `Z3Handler.cpp`
 * (or check the commit here: https://github.com/Hanseltu/z3-solver/commit/59605d5fbb19ddaf70a68ad29b5a765ebf9b24e3#diff-29840bbe7222209931da38349f5098b73977e4caa744aa48185540693296c636R205 : please ignore other changes as they only for debug purpose)
 
+#### 20221025
 
+* make the changes in two commits in `Expr.h` and `Z3Handler.cpp` below:
+   * https://github.com/Hanseltu/z3-solver/commit/9e99ec14a59c73777a9142e9a93860cf62e6110c
+   * https://github.com/Hanseltu/z3-solver/commit/22491bded1b94593a062f87c7fcef3fdcc4db360
+
+#### 20221025
+* make the changes in the commit in `Expr.h` and `Z3Handler.cpp` below:
+   * https://github.com/Hanseltu/z3-solver/commit/92f7cb12e7e4038433c64e0c75feace8d9fafc38
