@@ -410,6 +410,7 @@ class SignExtExpr : public UryExpr {
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return SignEXT; }
     ExprPtr getExprPtr() { return E; }
+    int getSize() {return size;}
 };
 
 class ZeroExtExpr : public UryExpr {
@@ -420,6 +421,7 @@ class ZeroExtExpr : public UryExpr {
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return ZeroEXT; }
     ExprPtr getExprPtr() { return E; }
+    int getSize() {return size;}
 };
 
 class EqualExpr : public UryExpr {

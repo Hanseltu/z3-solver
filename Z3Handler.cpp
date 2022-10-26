@@ -404,8 +404,7 @@ z3::expr Z3Handler::Z3HandlingExprPtr(ExprPtr ptr){
             return Z3HandleSignExt(ptr);
         }
         case Expr::Kind::ZeroEXT:{
-            printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? ZeroEXT \033[0m\n");
-            throw ptr;
+            return Z3HandleZeroEXT(ptr);
         }
         case Expr::Kind::Shrd:{
             printf("\033[47;31m Z3 Handlering ERROR : Unsupported type of EXPR? Shrd\033[0m\n");
@@ -685,17 +684,26 @@ z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){ // not sure how to write z3 ex
         throw signext_expr;
     }
     expr x = Z3HandlingExprPtr(signext_expr->getExprPtr());
-    int size = ptr->getExprSize();
+    int size = signext_expr->getSize();
     printf("size in SignEXT : %d\n", size);
     std::cout << x << std::endl;
-    return z3::sext(x, 64 );  //TODO just double the size, please make sure
+    return z3::sext(x, size * 8 * 2);  //TODO just double the size, please make sure
     //expr ret = z3::sext(x, 0 );  //TODO just double the size, please make sure
     //std::cout << "ret : " << ret << std::endl;
     //return ret;
 }
 
 z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){ // not sure how to write z3 expr
-    return context_.bv_val(100, 64);
+    ZeroExtExpr *zeroext_expr = static_cast<ZeroExtExpr*>(ptr.get());
+    if (zeroext_expr == NULL){
+        printf("\033[47;31m Z3 Handlering ERROR : ZeroExtExpr \033[0m\n");
+        throw zeroext_expr;
+    }
+    expr x = Z3HandlingExprPtr(zeroext_expr->getExprPtr());
+    int size = zeroext_expr->getSize();
+    printf("size in ZeroEXT : %d\n", size);
+    std::cout << x << std::endl;
+    return z3::zext(x, size * 8 * 2);  //TODO just double the size, please make sure
 }
 
 z3::expr Z3Handler::Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l){  // not sure how to write z3 expr

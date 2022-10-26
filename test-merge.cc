@@ -62,7 +62,7 @@ void test(){
     //ugt->print();
     std::cout << "\n";
     // test SignExpr/NoSignExpr
-
+    /*
     ExprPtr const_expr00 = std::make_shared<ConstExpr>(0xfffffffffffffffe);
     const_expr00->size = 8;
     ExprPtr const_expr11 = std::make_shared<ConstExpr>(0x2);
@@ -70,6 +70,7 @@ void test(){
     ExprPtr sign_expr = std::make_shared<SignExpr>(const_expr00);
     expr sign_expr_z3 = z3_handler->Z3HandleSign(sign_expr);
     std:: cout << "sign_expr : " << sign_expr_z3 << std::endl;
+    */
     // testing CombineMulti
     /*
     ExprPtr const_expr00 = std::make_shared<ConstExpr>(0x1);
@@ -102,7 +103,6 @@ void test(){
     expr test_expr = multicombine_expr_z3 - const_expr00_z3;
     std::cout << "test_expr:" << test_expr << std::endl;
     */
-    /*
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
     //std::cout << "ret_extract length : " << ret_extract.get_sort() << std::endl;
@@ -143,13 +143,12 @@ void test(){
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
     std::map<std::string, unsigned long long> ret_result;
     unsigned long long time_start_solve = rdtsc();
-    //ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
+    ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
     unsigned long long time_end_solve = rdtsc();
     for (auto it = ret_result.begin(); it != ret_result.end(); it ++){
         std::cout << "symbol : " << it->first << std::endl;
         printf("value : %llu(dec) %x(hex) \n", it->second, (unsigned int) it->second);
     }
-    */
     /*
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
