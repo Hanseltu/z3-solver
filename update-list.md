@@ -56,3 +56,8 @@
 #### 20221026
 * make the changes in the commit in `Expr.h` and `Z3Handler.cpp` below:
    * https://github.com/Hanseltu/z3-solver/commit/92f7cb12e7e4038433c64e0c75feace8d9fafc38
+
+
+#### 20221121
+*  Fix the issue of "Assertion `a.is_bool() && b.is_bool()' failed"
+   * replace the implementation of function [`Z3Handler::Z3HandleSign`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L713) and [`Z3Handler::Z3HandleNoSign`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L727) in `Z3Handler.cpp`
