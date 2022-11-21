@@ -13,10 +13,10 @@ void test(){
     // create a symbolic object
     VMState::SYMemObject *obj = new VMState::SYMemObject;
     VMState::SYMemObject *obj1 = new VMState::SYMemObject;
-    obj1->size = 4;
+    obj1->size = 8;
     obj->has_seed = 1;
     obj->name = "niceval";
-    obj->size = 4;
+    obj->size = 8;
     UDefExpr *sym_expr = new UDefExpr(obj);
     // Z3HandleUND(sym)
     Z3HANDLER::Z3Handler *z3_handler = new Z3HANDLER::Z3Handler();
