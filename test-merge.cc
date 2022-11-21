@@ -13,10 +13,10 @@ void test(){
     // create a symbolic object
     VMState::SYMemObject *obj = new VMState::SYMemObject;
     VMState::SYMemObject *obj1 = new VMState::SYMemObject;
-    obj1->size = 8;
+    obj1->size = 4;
     obj->has_seed = 1;
     obj->name = "niceval";
-    obj->size = 8;
+    obj->size = 4;
     UDefExpr *sym_expr = new UDefExpr(obj);
     // Z3HandleUND(sym)
     Z3HANDLER::Z3Handler *z3_handler = new Z3HANDLER::Z3Handler();
@@ -61,6 +61,7 @@ void test(){
     //lnot->print();
     //ugt->print();
     std::cout << "\n";
+
     // test SignExpr/NoSignExpr
     /*
     ExprPtr const_expr00 = std::make_shared<ConstExpr>(0xfffffffffffffffe);
@@ -71,6 +72,8 @@ void test(){
     expr sign_expr_z3 = z3_handler->Z3HandleSign(sign_expr);
     std:: cout << "sign_expr : " << sign_expr_z3 << std::endl;
     */
+
+
     // testing CombineMulti
     /*
     ExprPtr const_expr00 = std::make_shared<ConstExpr>(0x1);
@@ -132,15 +135,66 @@ void test(){
     //lnot2->print();
     //std::cout << "\n";
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
+    //
+
+    // testing 2022.11.21
+    // Sign(And(sym, sym)) and NoSign(And(sym, sym))
+    // Sign(And(count_rsi,count_rsi)) testtest: /home/neo/smu/kernel-se/z3/include/z3++.h:1652: z3::expr z3::operator&&(const z3::expr&, const z3::expr&): Assertion `a.is_bool() && b.is_bool()' failed.
+    /*
+    ExprPtr and_expr_test = std::make_shared<AndExpr>(udef_expr, udef_expr);
+    ExprPtr sign_expr_test = std::make_shared<SignExpr>(and_expr_test);
+    SignExpr *sign_test = static_cast<SignExpr*>(sign_expr_test.get());
+
+    ExprPtr nosign_expr_test = std::make_shared<NoSignExpr>(and_expr_test);
+    SignExpr *nosign_test = static_cast<SignExpr*>(nosign_expr_test.get());
+    sign_test->print();
+    nosign_test->print();
+    */
+
+    // testing 2022.11.21
+    // Ult(Add(Add(CombineMulti(Extract(gid_rdi, 0, 4), 0x0, 0xc9, 0xff, 0xff, ),Mul(0x1,0x1)),0xffffffffffffffff),0x0) terminate called after throwing an instance of 'z3::exception' what():  Argument #x01 at position 1 does not match declaration (declare-fun bvmul ((_ BitVec 64) (_ BitVec 64)) (_ BitVec 64))
+    /*
+    ExprPtr mul_expr = std::make_shared<MulExpr>(const_expr3, const_expr3);
+    MulExpr *mul_test = static_cast<MulExpr*>(mul_expr.get());
+    ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
+    ExprPtr const_expr_test1 = std::make_shared<ConstExpr>(0x0);
+    ExprPtr const_expr_test2 = std::make_shared<ConstExpr>(0xc9);
+    ExprPtr const_expr_test3 = std::make_shared<ConstExpr>(0xff);
+    ExprPtr const_expr_test4 = std::make_shared<ConstExpr>(0xff);
+    ExprPtr const_expr_test5 = std::make_shared<ConstExpr>(0xffffffffffffffff);
+    ExprPtr multicombine_expr_test = std::make_shared<CombineMultiExpr>(extract_expr_test, const_expr1, const_expr2, const_expr3, const_expr_test4, const_expr_test4);
+    ExprPtr add_expr_test1 = std::make_shared<AddExpr>(multicombine_expr_test, mul_test);
+    ExprPtr add_expr_test2 = std::make_shared<AddExpr>(add_expr_test1, const_expr_test5);
+    ExprPtr ult_expr_test = std::make_shared<UltExpr>(add_expr_test2, const_expr_test1);
+    UltExpr *ult_test = static_cast<UltExpr*>(ult_expr_test.get());
+    //mul_test->print();
+    ult_test->print();
+    */
+
+    // testing 2022.11.21
+    //Distinct(And(Extract(flags_rdx, 0, 4),0xf8)) terminate called after throwing an instance of 'z3::exception' what():  ast is not an expression
+    ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
+    ExprPtr const_expr_test = std::make_shared<ConstExpr>(0xf8);
+    ExprPtr and_expr_test = std::make_shared<AndExpr>(extract_expr_test, const_expr_test);
+    ExprPtr dist_expr_test = std::make_shared<DistinctExpr>(and_expr_test);
+    DistinctExpr *dist_test = static_cast<DistinctExpr*>(dist_expr_test.get());
+    dist_test->print();
+
+
     std::set<KVExprPtr> constraints_test;
-    constraints_test.insert(equal_expr1);
+    constraints_test.insert(dist_expr_test);
+    //constraints_test.insert(sign_expr_test);
+    //constraints_test.insert(nosign_expr_test);
     //constraints_test.insert(lnot_expr1);
     //constraints_test.insert(lnot_expr2);
 
     //constraints_test.insert(ugt_expr);
     //constraints_test.insert(lnot_expr);
     //constraints_test.insert(equal_expr_test);
+
+    // testing Z3SolveOne
     Z3HANDLER::Z3Handler *z3_handler_test = new Z3HANDLER::Z3Handler();
+    /*
     std::map<std::string, unsigned long long> ret_result;
     unsigned long long time_start_solve = rdtsc();
     ret_result = z3_handler_test->Z3SolveOne(constraints_test); // now the [symbolic name, concrete value] map will be returned
@@ -149,7 +203,8 @@ void test(){
         std::cout << "symbol : " << it->first << std::endl;
         printf("value : %llu(dec) %x(hex) \n", it->second, (unsigned int) it->second);
     }
-    /*
+    */
+
     // testing concritize function
     // 'obj' is a symbolic object defined with SYMemObject*, 'value' is the concrete value; 'constraints_test' is a set of constraints
     std::vector<VMState::SYMemObject*> symobjts;
@@ -160,13 +215,12 @@ void test(){
     //symobjts.push_back(obj1);
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
     //values.push_back(1000);
-    unsigned long long time_start_concritize = rdtsc();
+    //unsigned long long time_start_concritize = rdtsc();
     bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
     std::cout << "result of concritize : " << ret_con << std::endl;
-    unsigned long long time_end_concritize = rdtsc();
-    std::cout << "Time for Z3SolveOne : " << time_end_solve - time_start_solve << std::endl;
-    std::cout << "Time for Z3SolveConcritize : " << time_end_concritize - time_start_concritize << std::endl;
-    */
+    //unsigned long long time_end_concritize = rdtsc();
+    //std::cout << "Time for Z3SolveOne : " << time_end_solve - time_start_solve << std::endl;
+    //std::cout << "Time for Z3SolveConcritize : " << time_end_concritize - time_start_concritize << std::endl;
 }
 void eval_example1() {
     std::cout << "eval example 1\n";
