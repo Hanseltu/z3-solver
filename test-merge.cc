@@ -13,10 +13,10 @@ void test(){
     // create a symbolic object
     VMState::SYMemObject *obj = new VMState::SYMemObject;
     VMState::SYMemObject *obj1 = new VMState::SYMemObject;
-    obj1->size = 8;
+    obj1->size = 4;
     obj->has_seed = 1;
     obj->name = "niceval";
-    obj->size = 8;
+    obj->size = 4;
     UDefExpr *sym_expr = new UDefExpr(obj);
     // Z3HandleUND(sym)
     Z3HANDLER::Z3Handler *z3_handler = new Z3HANDLER::Z3Handler();
@@ -26,7 +26,6 @@ void test(){
     ExprPtr udef_expr = std::make_shared<UDefExpr>(obj);
     expr ret_udef = z3_handler->Z3HandleUND(udef_expr);
     std::cout << "ret_udef : " << ret_udef << std::endl;
-
     //testing Const
     ExprPtr const_expr = std::make_shared<ConstExpr>(0x13);
     expr ret_const = z3_handler->Z3HandleConst(const_expr);
@@ -56,7 +55,7 @@ void test(){
     LNotExpr *lnot = static_cast<LNotExpr*>(lnot_expr.get());
     UgtExpr *ugt = static_cast<UgtExpr*>(ugt_expr.get());
     std::cout << "+++ Original Expression: \n" ;
-    equal_expr_test->print();
+    //equal_expr_test->print();
     //sub_expr->print();
     //lnot->print();
     //ugt->print();
@@ -106,6 +105,7 @@ void test(){
     expr test_expr = multicombine_expr_z3 - const_expr00_z3;
     std::cout << "test_expr:" << test_expr << std::endl;
     */
+    /*
     expr ret_combine = z3_handler->Z3HandleCombine(udef_expr, const_expr1);
     expr ret_extract = z3_handler->Z3HandleExtract(extract_expr);
     //std::cout << "ret_extract length : " << ret_extract.get_sort() << std::endl;
@@ -132,6 +132,8 @@ void test(){
     LNotExpr *lnot2 = static_cast<LNotExpr*>(lnot_expr2.get());
     //lnot1->print();
     std::cout << "\n";
+    std::cout << "starting testing --- \n";
+    */
     //lnot2->print();
     //std::cout << "\n";
     // Merging from here; assuming we have got the constraints (defined in std::set<KVExprPtr>), 'constraints_test' in this code
@@ -171,18 +173,79 @@ void test(){
     ult_test->print();
     */
 
-    // testing 2022.11.21
+    // testing 2022.11.21 # TODO no work
     //Distinct(And(Extract(flags_rdx, 0, 4),0xf8)) terminate called after throwing an instance of 'z3::exception' what():  ast is not an expression
+    /*
     ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
     ExprPtr const_expr_test = std::make_shared<ConstExpr>(0xf8);
     ExprPtr and_expr_test = std::make_shared<AndExpr>(extract_expr_test, const_expr_test);
     ExprPtr dist_expr_test = std::make_shared<DistinctExpr>(and_expr_test);
     DistinctExpr *dist_test = static_cast<DistinctExpr*>(dist_expr_test.get());
     dist_test->print();
+    */
+
+
+    /*
+    // testing 2022.11.29 TODO not passed
+    // Equal(Sub(CombineMulti(And(Extract(prot_rsi, 0, 4),0x5), Extract(prot_rsi, 4, 8), ),0x1))terminate called after throwing an instance of 'z3::exception' what():  ast is not an expression std::set<KVExprPtr> constraints_test;
+    ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
+    ExtractExpr *extract_test1 = static_cast<ExtractExpr*>(extract_expr_test.get());
+    extract_test1->print();
+    std::cout << "\n";
+
+    ExprPtr const_expr_test = std::make_shared<ConstExpr>(0x5);
+    const_expr_test->size = 4;
+    ExprPtr and_expr_test1 = std::make_shared<AndExpr>(extract_expr_test, const_expr_test);
+    //ExprPtr dist_expr_test = std::make_shared<DistinctExpr>(and_expr_test);
+    //DistinctExpr *dist_test = static_cast<DistinctExpr*>(dist_expr_test.get());
+    //dist_test->print();
+    AndExpr *and_test = static_cast<AndExpr*>(and_expr_test1.get());
+    and_test->print();
+    std::cout << "\n";
+    expr and_expr_z3 = z3_handler->Z3HandleAnd(and_expr_test1, const_expr_test);
+    std::cout << "and_expr_z3 : " << and_expr_z3 << std::endl;
+
+    ExprPtr extract_expr_test2 = std::make_shared<ExtractExpr>(udef_expr, 4, 8);
+    ExtractExpr *extract_test2 = static_cast<ExtractExpr*>(extract_expr_test2.get());
+    extract_test2->print();
+    std::cout << "\n";
+
+    std::vector<ExprPtr> e;
+    std::vector<int> s;
+    std::vector<int> o;
+    e.push_back(and_expr_test1);
+    e.push_back(extract_expr_test2);
+    s.push_back(4);
+    s.push_back(4);
+    o.push_back(0);
+    o.push_back(4);
+    ExprPtr multicombine_expr = std::make_shared<CombineMultiExpr>(e, o, s);
+    CombineMultiExpr *combine_expr_test = static_cast<CombineMultiExpr*>(multicombine_expr.get());
+    combine_expr_test->print();
+
+
+    ExprPtr const_expr_test1 = std::make_shared<ConstExpr>(0x1);
+    const_expr_test1->size = 4;
+    ExprPtr sub_expr_test = std::make_shared<SubExpr>(multicombine_expr, const_expr_test1);
+    sub_expr_test->print();
+    */
+
+    // testing 2022.12.13
+    // Distinct(And(ZeroEXT(Extract(mode_rdx, 0, 2)),0x8000000)) ast is not an expression
+    ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 1);
+    ExprPtr zeroext_expr_test = std::make_shared<ZeroExtExpr>(extract_expr_test);
+    ExprPtr const_expr_test = std::make_shared<ConstExpr>(0xe0);
+    const_expr_test->size = 4;
+    ExprPtr and_expr_test = std::make_shared<AndExpr>(zeroext_expr_test, const_expr_test);
+    ExprPtr dist_expr_test = std::make_shared<DistinctExpr>(and_expr_test);
+    DistinctExpr *dist_test = static_cast<DistinctExpr*>(dist_expr_test.get());
+    dist_test->print();
 
 
     std::set<KVExprPtr> constraints_test;
-    constraints_test.insert(dist_expr_test);
+    //constraints_test.insert(sub_expr_test);
+    //constraints_test.insert(dist_expr_test);
+    constraints_test.insert(and_expr_test);
     //constraints_test.insert(sign_expr_test);
     //constraints_test.insert(nosign_expr_test);
     //constraints_test.insert(lnot_expr1);
@@ -255,6 +318,33 @@ void eval_example1() {
     std::cout << "Model:\n" << m << "\n";
     std::cout << "x+y = " << m.eval(x+y) << "\n";
     */
+    /*
+    expr xx = c.bv_const("xx", 32);
+    expr yy = c.bv_const("yy", 32);
+    expr const_test1 = c.bv_val(1, 32);
+    expr const_test2 = c.bv_val(1, 32);
+    expr sym_and_const = xx & const_test1;
+    expr const_and_const = const_test1 & const_test2;
+    expr sym_and_sym = xx & yy;
+    std::cout << "const_and_const : " << const_and_const << std::endl;
+    std::cout << "sym_and_sym : " << sym_and_sym << std::endl;
+    std::cout << "sym_and_const : " << sym_and_const << std::endl;
+    std::cout << "length of sym_and_const : "  << std::endl;
+    expr comb = z3::concat(sym_and_const, const_test2);
+    expr subtest = yy - const_test1;
+    std::cout << "comb : " << comb << std::endl;
+    std::cout << "subtest : " << subtest << std::endl;
+    */
+
+    expr zz = c.bv_const("zz", 32);
+    expr aa = zz.extract(15, 0);
+    expr const_test1 = c.bv_val(0x8000000, 32);
+    expr zeroext = z3::zext(aa, 16);
+    std::cout << "zeroext : " << zeroext << std::endl;
+    expr and_test = zeroext & const_test1;
+    // expr dist = and_test != 0;
+    std::cout << "and_test : " << and_test << std::endl;
+
 }
 
 
@@ -281,13 +371,14 @@ void substitute_example() {
     std::cout << new_f << std::endl;
     std::cout << new_f.simplify().is_true() << std::endl;
     std::cout << "Time for normal Z3 (in substitute): " << end - start  << std::endl;
+
 }
 
 
 int main(){
     test();
     //unsigned long long start = rdtsc();
-    //eval_example1();
+   //  eval_example1();
     //substitute_example();
     //unsigned long long end = rdtsc();
     //std::cout << "Time for normal Z3 : " << end - start  << std::endl;

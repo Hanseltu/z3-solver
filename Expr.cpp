@@ -42,7 +42,8 @@ static char exprName[][16] = {"","","","","","","",
                             "Overflow",
                             "NoOverflow",
                             "Combine",
-                            "Extract"
+                            "Extract",
+                            "CombineMulti"
                             };
 
 
@@ -89,6 +90,16 @@ void ExtractExpr::print () {
     std::cout << ", " << s << ", " << e ;
     std::cout<<")";
 }
+
+void CombineMultiExpr::print () {
+    std::cout<<exprName[exprID]<<"(";
+    for (auto e : exprs) {
+        e->print() ;
+        std::cout << ", " ;
+    }
+    std::cout<<")";
+}
+
 /*
 KVExprPtr CreateExprByID(int id, KVExprPtr R, KVExprPtr M, KVExprPtr L, int size = 4, int offset = 0) {
 

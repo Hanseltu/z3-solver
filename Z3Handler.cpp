@@ -96,13 +96,20 @@ bool Z3Handler::Z3ExpressionEvaluator(expr org_expr, expr sym_expr, expr con_exp
 */
 bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all, std::set<KVExprPtr> constraints){
     bool ret = 0;
-    expr exprs = context_.bool_val(1);
-    std::cout << "in Z3SolveConcritize" << std::endl;
+    //get the first element
+    auto firstExpr = constraints.begin();
+    expr exprs = Z3HandlingExprPtr(*firstExpr);
+    std::cout << "\n in Z3SolveConcritize" << std::endl;
     for (auto i : constraints){
         i->print();
         printf("\n");
     }
-    for (auto it = constraints.begin(); it != constraints.end(); it++){
+    // start from second constraints and combine all constraints together
+    auto it = constraints.begin();
+    it++;
+    for (; it != constraints.end(); it++){
+        //std::cout << "##### Z3HandlingExprPtr :" << Z3HandlingExprPtr(*it) << std::endl;
+        //exprs = exprs & Z3HandlingExprPtr(*it);
         exprs = exprs & Z3HandlingExprPtr(*it);
     }
     std::cout << "exprs : " << exprs << std::endl;
@@ -469,7 +476,8 @@ z3::expr Z3Handler::Z3HandleConst(ExprPtr const_expr_ptr){ // 3
     uint64_t value = const_expr->getValue();
     //std::cout << "value in ConstExpr : " << value << std::endl;
     int size = const_expr->getSize();
-    expr x = context_.bv_val(value, size * 8);
+    z3::expr x = context_.bv_val(value, size * 8);
+    //z3::expr x = context_.int_val(value); // the value has already defined as uint64_t
     return x;
 }
 
@@ -687,7 +695,7 @@ z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){ // not sure how to write z3 ex
     int size = signext_expr->getSize();
     printf("size in SignEXT : %d\n", size);
     std::cout << x << std::endl;
-    return z3::sext(x, size * 8 * 2);  //TODO just double the size, please make sure
+    return z3::sext(x, size * 8);  //TODO just double the size, please make sure
     //expr ret = z3::sext(x, 0 );  //TODO just double the size, please make sure
     //std::cout << "ret : " << ret << std::endl;
     //return ret;
@@ -702,8 +710,10 @@ z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){ // not sure how to write z3 ex
     expr x = Z3HandlingExprPtr(zeroext_expr->getExprPtr());
     int size = zeroext_expr->getSize();
     printf("size in ZeroEXT : %d\n", size);
+    //std::cout << "size before zero ext : " << x.length() << std::endl;
     std::cout << x << std::endl;
-    return z3::zext(x, size * 8 * 2);  //TODO just double the size, please make sure
+    std::cout << "return from ZeroEXT: " <<  z3::zext(x, size * 8 * 2) << std::endl;  //TODO just double the size, please make sure
+    return z3::zext(x, size * 8 * 3);  //TODO just double the size, please make sure
 }
 
 z3::expr Z3Handler::Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l){  // not sure how to write z3 expr

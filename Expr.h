@@ -640,7 +640,7 @@ class CombineMultiExpr :public Expr {
     CombineMultiExpr(std::vector <ExprPtr> e, std::vector <int> o, std::vector <int> s, int sz, int off) : Expr(sz, off)
         {exprID = EXPR_CombineMulti; exprs=e; offsets=o; sizes=s;}
 
-    //virtual void print () ;
+    virtual void print () ;
 
     // @THX
     Kind getKind() const { return Kind::CombineMultiExpr; }
