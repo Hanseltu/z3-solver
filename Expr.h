@@ -405,7 +405,10 @@ class LNotExpr : public UryExpr {
 class SignExtExpr : public UryExpr {
    public:
     SignExtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_SignEXT;}
-    SignExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_SignEXT;}
+    SignExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {
+        exprID = EXPR_SignEXT;
+        size = sz; // THX return expected size after sign extension
+    }
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return SignEXT; }
@@ -416,7 +419,10 @@ class SignExtExpr : public UryExpr {
 class ZeroExtExpr : public UryExpr {
    public:
     ZeroExtExpr(ExprPtr e) : UryExpr(e) {exprID = EXPR_ZeroEXT;}
-    ZeroExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {exprID = EXPR_ZeroEXT;}
+    ZeroExtExpr(ExprPtr e, int sz, int off) : UryExpr(e, sz, off) {
+        exprID = EXPR_ZeroEXT;
+        size = sz; // THX return expected size after zero extension
+    }
 
     // @THX add the implemenation of the virtual function
     Kind getKind() const { return ZeroEXT; }

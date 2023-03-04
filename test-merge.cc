@@ -27,11 +27,11 @@ void test(){
     expr ret_udef = z3_handler->Z3HandleUND(udef_expr);
     std::cout << "ret_udef : " << ret_udef << std::endl;
     //testing Const
-    ExprPtr const_expr = std::make_shared<ConstExpr>(0x13);
+    ExprPtr const_expr = std::make_shared<ConstExpr>(0xffffffffffff1ffe);
     expr ret_const = z3_handler->Z3HandleConst(const_expr);
     std::cout << "ret_const : " << ret_const << std::endl;
     //testing Add
-    ExprPtr add_expr = std::make_shared<AddExpr>(const_expr, const_expr);
+    ExprPtr add_expr = std::make_shared<AddExpr>(udef_expr, const_expr);
     expr ret_add =  z3_handler->Z3HandleAdd(const_expr, const_expr);
     std::cout << "ret_add : " << ret_add << std::endl;
     //expr con = ret_udef == ret_add;
@@ -184,13 +184,14 @@ void test(){
     dist_test->print();
     */
 
-
+    /*
     // testing 2022.11.29 TODO not passed
     // Equal(Sub(CombineMulti(And(Extract(prot_rsi, 0, 4),0x5), Extract(prot_rsi, 4, 8), ),0x1))terminate called after throwing an instance of 'z3::exception' what():  ast is not an expression std::set<KVExprPtr> constraints_test;
     ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
     ExtractExpr *extract_test1 = static_cast<ExtractExpr*>(extract_expr_test.get());
     extract_test1->print();
     std::cout << "\n";
+    */
 
     /*
     ExprPtr const_expr_test = std::make_shared<ConstExpr>(0x5);
@@ -230,26 +231,27 @@ void test(){
     sub_expr_test->print();
     */
 
-    /*
+
     // testing 2022.12.13
     // Distinct(And(ZeroEXT(Extract(mode_rdx, 0, 2)),0x8000000)) ast is not an expression
     // @TODO done in 2023.3.3: fix this by change the way to combine experssions
     ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 1);
-    ExprPtr zeroext_expr_test = std::make_shared<ZeroExtExpr>(extract_expr_test);
+    ExprPtr zeroext_expr_test = std::make_shared<ZeroExtExpr>(extract_expr_test, 4, 0);
     ExprPtr const_expr_test = std::make_shared<ConstExpr>(0xe0);
     const_expr_test->size = 4;
     ExprPtr and_expr_test = std::make_shared<AndExpr>(zeroext_expr_test, const_expr_test);
     ExprPtr dist_expr_test = std::make_shared<DistinctExpr>(and_expr_test);
     DistinctExpr *dist_test = static_cast<DistinctExpr*>(dist_expr_test.get());
     dist_test->print();
-    */
+    std::cout << "\n";
+
 
 
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(sub_expr_test);
-    constraints_test.insert(sub_expr1);
+    //constraints_test.insert(add_expr);
     //constraints_test.insert(dist_expr_test);
-    //constraints_test.insert(and_expr_test);
+    constraints_test.insert(and_expr_test);
     //constraints_test.insert(sign_expr_test);
     //constraints_test.insert(nosign_expr_test);
     //constraints_test.insert(lnot_expr1);
@@ -277,14 +279,14 @@ void test(){
     std::vector<VMState::SYMemObject*> symobjts;
     //obj->i32 = 1;
     //symobjts.push_back(obj);
-    obj->i32 = 2;
+    obj->i32 = 20;
     symobjts.push_back(obj);
     //symobjts.push_back(obj1);
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
     //values.push_back(1000);
     //unsigned long long time_start_concritize = rdtsc();
     bool ret_bool = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
-    uint64_t ret_con = z3_handler_test->Z3SolveConcritizeToConstant(symobjts, constraints_test);
+    int64_t ret_con = z3_handler_test->Z3SolveConcritizeToConstant(symobjts, constraints_test);
     std::cout << "result of concritize (to bool): " << ret_bool << std::endl;
     std::cout << "result of concritize (to a constant) : " << ret_con << std::endl;
     //unsigned long long time_end_concritize = rdtsc();

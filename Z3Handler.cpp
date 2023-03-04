@@ -138,17 +138,21 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all
         if (symobj->has_seed == true)
             symobjs.push_back(symobj);
     }
+    /*
     if (symobjs.size() != symObjectsMap.size()){
         // TODO for further use of the constraints: e.g., partially concritiize the symbolic variables
         printf("\033[47;31m To be explored: the number of symbolic variables to be concretized are not the same as the ones in the constraints \033[0m\n");
         exit(1);
     }
+    */
     // the following are for expression evaluator
     for (int i = 0; i < symobjs.size(); i++){
         // checking whether the input obj exists in the corrent constraints, raise an error if no;
+        /*
         if (symObjectsMap.find(symobjs[i]) == symObjectsMap.end()) {
             printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
         }
+        */
         // otherwise, evaluate the expression and let it return true/false
         // evaluate the expression based on different object size
         switch (symobjs[i]->size){
@@ -257,7 +261,8 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all
 /*
  * Function: retrurn a  constraint to a constant after concritizing a symbolic variable
  * Input: 1) Symbolic objects defined in SYMemObject*, which includes their concrete values; 2) a set of constraints
- * Output: a uint64_t value @TODO: the type of return value can have overflow issues; need to correctly decide the type of the return value
+ * Output: a int64_t value
+ * @TODO: only support return uint64_t
  *
 */
 uint64_t Z3Handler::Z3SolveConcritizeToConstant(std::vector<VMState::SYMemObject*> symobjs_all, std::set<KVExprPtr> constraints){
@@ -285,17 +290,21 @@ uint64_t Z3Handler::Z3SolveConcritizeToConstant(std::vector<VMState::SYMemObject
         if (symobj->has_seed == true)
             symobjs.push_back(symobj);
     }
+    /*
     if (symobjs.size() != symObjectsMap.size()){
         // TODO for further use of the constraints: e.g., partially concritiize the symbolic variables
         printf("\033[47;31m To be explored: the number of symbolic variables to be concretized are not the same as the ones in the constraints \033[0m\n");
         exit(1);
     }
+    */
     // the following are for expression evaluator
     for (int i = 0; i < symobjs.size(); i++){
         // checking whether the input obj exists in the corrent constraints, raise an error if no;
+        /*
         if (symObjectsMap.find(symobjs[i]) == symObjectsMap.end()) {
             printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
         }
+        */
         // otherwise, evaluate the expression and let it return true/false
         // evaluate the expression based on different object size
         switch (symobjs[i]->size){
@@ -851,35 +860,34 @@ z3::expr Z3Handler::Z3HandleLNot(ExprPtr ptr){
     return ret;
 }
 
-z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){ // not sure how to write z3 expr
+z3::expr Z3Handler::Z3HandleSignExt(ExprPtr ptr){
     SignExtExpr *signext_expr = static_cast<SignExtExpr*>(ptr.get());
     if (signext_expr == NULL){
         printf("\033[47;31m Z3 Handlering ERROR : SignExtExpr \033[0m\n");
         throw signext_expr;
     }
     expr x = Z3HandlingExprPtr(signext_expr->getExprPtr());
-    int size = signext_expr->getSize();
-    printf("size in SignEXT : %d\n", size);
+    unsigned expected_expr_size = signext_expr->getSize();
+    unsigned unextended_expr_size = x.get_sort().bv_size() / 8;
+    std::cout << "expected_expr_size : " << expected_expr_size << std::endl;
+    std::cout << "unextended_expr_size : " << unextended_expr_size << std::endl;
     std::cout << x << std::endl;
-    return z3::sext(x, size * 8);  //TODO just double the size, please make sure
-    //expr ret = z3::sext(x, 0 );  //TODO just double the size, please make sure
-    //std::cout << "ret : " << ret << std::endl;
-    //return ret;
+    return z3::sext(x, (expected_expr_size - unextended_expr_size) * 8); // the total size will be expected_expr_size
 }
 
-z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){ // not sure how to write z3 expr
+z3::expr Z3Handler::Z3HandleZeroEXT(ExprPtr ptr){
     ZeroExtExpr *zeroext_expr = static_cast<ZeroExtExpr*>(ptr.get());
     if (zeroext_expr == NULL){
         printf("\033[47;31m Z3 Handlering ERROR : ZeroExtExpr \033[0m\n");
         throw zeroext_expr;
     }
     expr x = Z3HandlingExprPtr(zeroext_expr->getExprPtr());
-    int size = zeroext_expr->getSize();
-    printf("size in ZeroEXT : %d\n", size);
-    //std::cout << "size before zero ext : " << x.length() << std::endl;
+    unsigned expected_expr_size = zeroext_expr->getSize();
+    unsigned unextended_expr_size = x.get_sort().bv_size() / 8;
+    std::cout << "expected_expr_size : " << expected_expr_size << std::endl;
+    std::cout << "unextended_expr_size : " << unextended_expr_size << std::endl;
     std::cout << x << std::endl;
-    std::cout << "return from ZeroEXT: " <<  z3::zext(x, size * 8 * 2) << std::endl;  //TODO just double the size, please make sure
-    return z3::zext(x, size * 8 * 3);  //TODO just double the size, please make sure
+    return z3::zext(x, (expected_expr_size - unextended_expr_size) * 8); // the total size will be expected_expr_size
 }
 
 z3::expr Z3Handler::Z3HandleShrd(ExprPtr r, ExprPtr m, ExprPtr l){  // not sure how to write z3 expr
