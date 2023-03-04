@@ -39,7 +39,7 @@ void test(){
     // testing LNot(Ugt(Sub(0x2, Extract(Combine(0x, which_rdi), 0, 4)))
     ExprPtr const_expr1 = std::make_shared<ConstExpr>(0x0);
     ExprPtr const_expr2 = std::make_shared<ConstExpr>(0x2);
-    ExprPtr const_expr3 = std::make_shared<ConstExpr>(0x1);
+    ExprPtr const_expr3 = std::make_shared<ConstExpr>(0x10);
     CombineExpr *combine = new CombineExpr(const_expr1, udef_expr, 0, 0);
     ExprPtr combine_expr = std::make_shared<CombineExpr>(udef_expr, const_expr1, 0, 0);
     ExprPtr extract_expr = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
@@ -153,9 +153,9 @@ void test(){
     nosign_test->print();
     */
 
+    /*
     // testing 2022.11.21
     // Ult(Add(Add(CombineMulti(Extract(gid_rdi, 0, 4), 0x0, 0xc9, 0xff, 0xff, ),Mul(0x1,0x1)),0xffffffffffffffff),0x0) terminate called after throwing an instance of 'z3::exception' what():  Argument #x01 at position 1 does not match declaration (declare-fun bvmul ((_ BitVec 64) (_ BitVec 64)) (_ BitVec 64))
-    /*
     ExprPtr mul_expr = std::make_shared<MulExpr>(const_expr3, const_expr3);
     MulExpr *mul_test = static_cast<MulExpr*>(mul_expr.get());
     ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
@@ -185,7 +185,6 @@ void test(){
     */
 
 
-    /*
     // testing 2022.11.29 TODO not passed
     // Equal(Sub(CombineMulti(And(Extract(prot_rsi, 0, 4),0x5), Extract(prot_rsi, 4, 8), ),0x1))terminate called after throwing an instance of 'z3::exception' what():  ast is not an expression std::set<KVExprPtr> constraints_test;
     ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 4);
@@ -193,6 +192,7 @@ void test(){
     extract_test1->print();
     std::cout << "\n";
 
+    /*
     ExprPtr const_expr_test = std::make_shared<ConstExpr>(0x5);
     const_expr_test->size = 4;
     ExprPtr and_expr_test1 = std::make_shared<AndExpr>(extract_expr_test, const_expr_test);
@@ -230,8 +230,10 @@ void test(){
     sub_expr_test->print();
     */
 
+    /*
     // testing 2022.12.13
     // Distinct(And(ZeroEXT(Extract(mode_rdx, 0, 2)),0x8000000)) ast is not an expression
+    // @TODO done in 2023.3.3: fix this by change the way to combine experssions
     ExprPtr extract_expr_test = std::make_shared<ExtractExpr>(udef_expr, 0, 1);
     ExprPtr zeroext_expr_test = std::make_shared<ZeroExtExpr>(extract_expr_test);
     ExprPtr const_expr_test = std::make_shared<ConstExpr>(0xe0);
@@ -240,12 +242,14 @@ void test(){
     ExprPtr dist_expr_test = std::make_shared<DistinctExpr>(and_expr_test);
     DistinctExpr *dist_test = static_cast<DistinctExpr*>(dist_expr_test.get());
     dist_test->print();
+    */
 
 
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(sub_expr_test);
+    constraints_test.insert(sub_expr1);
     //constraints_test.insert(dist_expr_test);
-    constraints_test.insert(and_expr_test);
+    //constraints_test.insert(and_expr_test);
     //constraints_test.insert(sign_expr_test);
     //constraints_test.insert(nosign_expr_test);
     //constraints_test.insert(lnot_expr1);
@@ -273,14 +277,16 @@ void test(){
     std::vector<VMState::SYMemObject*> symobjts;
     //obj->i32 = 1;
     //symobjts.push_back(obj);
-    obj->i32 = 20;
+    obj->i32 = 2;
     symobjts.push_back(obj);
     //symobjts.push_back(obj1);
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
     //values.push_back(1000);
     //unsigned long long time_start_concritize = rdtsc();
-    bool ret_con = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
-    std::cout << "result of concritize : " << ret_con << std::endl;
+    bool ret_bool = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
+    uint64_t ret_con = z3_handler_test->Z3SolveConcritizeToConstant(symobjts, constraints_test);
+    std::cout << "result of concritize (to bool): " << ret_bool << std::endl;
+    std::cout << "result of concritize (to a constant) : " << ret_con << std::endl;
     //unsigned long long time_end_concritize = rdtsc();
     //std::cout << "Time for Z3SolveOne : " << time_end_solve - time_start_solve << std::endl;
     //std::cout << "Time for Z3SolveConcritize : " << time_end_concritize - time_start_concritize << std::endl;

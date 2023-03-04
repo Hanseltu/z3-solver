@@ -89,6 +89,25 @@ bool Z3Handler::Z3ExpressionEvaluator(expr org_expr, expr sym_expr, expr con_exp
 }
 
 /*
+ * Function: return a constant for constraints (expressions) which the symbols were concritized
+ * Input: 1) expr to be checked; 2) symbolic expr; 3) concrete expr to be substituted for symbolic expr
+ * Output: a uint64_t constant
+ *
+*/
+
+
+uint64_t Z3Handler::Z3ExpressionEvaluatorToConstant(expr org_expr, expr sym_expr, expr con_expr){
+    expr before_substitute(context_), after_substitute(context_);
+    before_substitute = sym_expr;
+    after_substitute = con_expr;
+    Z3_ast from[] = { before_substitute };
+    Z3_ast to [] = { after_substitute };
+    expr new_expr(context_);
+    new_expr = to_expr(context_, Z3_substitute(context_, org_expr, 1, from, to));
+    return new_expr.simplify().get_numeral_uint64();
+}
+
+/*
  * Function: check whether a constraint can be true when concritizing a symbolic variable
  * Input: 1) Symbolic objects defined in SYMemObject*, which includes their concrete values; 2) a set of constraints
  * Output: a bool value : true/false
@@ -220,6 +239,153 @@ bool Z3Handler::Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs_all
                         if (it->first == symobjs[i]) {
                             expr sym_expr = it->second;
                             ret = Z3Handler::Z3ExpressionEvaluator(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            default: {
+                printf("\033[47;31m Z3 Handlering ERROR : the concritized value has an unsupported size ! \033[0m\n");
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
+/*
+ * Function: retrurn a  constraint to a constant after concritizing a symbolic variable
+ * Input: 1) Symbolic objects defined in SYMemObject*, which includes their concrete values; 2) a set of constraints
+ * Output: a uint64_t value @TODO: the type of return value can have overflow issues; need to correctly decide the type of the return value
+ *
+*/
+uint64_t Z3Handler::Z3SolveConcritizeToConstant(std::vector<VMState::SYMemObject*> symobjs_all, std::set<KVExprPtr> constraints){
+    uint64_t ret = 0;
+    //get the first element
+    auto firstExpr = constraints.begin();
+    expr exprs = Z3HandlingExprPtr(*firstExpr);
+    std::cout << "\n in Z3SolveConcritize" << std::endl;
+    for (auto i : constraints){
+        i->print();
+        printf("\n");
+    }
+    // start from second constraints and combine all constraints together
+    auto it = constraints.begin();
+    it++;
+    for (; it != constraints.end(); it++){
+        //std::cout << "##### Z3HandlingExprPtr :" << Z3HandlingExprPtr(*it) << std::endl;
+        //exprs = exprs & Z3HandlingExprPtr(*it);
+        exprs = exprs & Z3HandlingExprPtr(*it);
+    }
+    std::cout << "exprs : " << exprs << std::endl;
+    // Filter the symbolic variables that are not marked with seed
+    std::vector<VMState::SYMemObject*> symobjs; // symbolic variables in the seed mode
+    for (auto symobj : symobjs_all) {
+        if (symobj->has_seed == true)
+            symobjs.push_back(symobj);
+    }
+    if (symobjs.size() != symObjectsMap.size()){
+        // TODO for further use of the constraints: e.g., partially concritiize the symbolic variables
+        printf("\033[47;31m To be explored: the number of symbolic variables to be concretized are not the same as the ones in the constraints \033[0m\n");
+        exit(1);
+    }
+    // the following are for expression evaluator
+    for (int i = 0; i < symobjs.size(); i++){
+        // checking whether the input obj exists in the corrent constraints, raise an error if no;
+        if (symObjectsMap.find(symobjs[i]) == symObjectsMap.end()) {
+            printf("\033[47;31m Z3 Handlering ERROR : The input symbolic object is not in the current constraints! \033[0m\n");
+        }
+        // otherwise, evaluate the expression and let it return true/false
+        // evaluate the expression based on different object size
+        switch (symobjs[i]->size){
+            case 1: { // 1 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i8, 1 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u8, 1 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case 2: { // 2 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i16, 2 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u16, 2 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case 4: { // 4 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i32, 4 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u32, 4 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case 8: { // 8 bytes
+                if (symobjs[i]->is_signed) {
+                    expr value_expr = context_.bv_val(symobjs[i]->i64, 8 * 8);
+                    std::cout << "value : " << symobjs[i]->i64 << std::endl;
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
+                            break;
+                        }
+                    }
+                }
+                else {
+                    expr value_expr = context_.bv_val(symobjs[i]->u64, 8 * 8);
+                    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it ++){
+                        if (it->first == symobjs[i]) {
+                            expr sym_expr = it->second;
+                            ret = Z3Handler::Z3ExpressionEvaluatorToConstant(exprs, sym_expr, value_expr);
                             break;
                         }
                     }

@@ -34,9 +34,13 @@ public:
     // solver function
     std::map<std::string, unsigned long long> Z3SolveOne(std::set<KVExprPtr> constraints);
 
-    // concritize function
+    // concritize function (to bool)
     bool Z3ExpressionEvaluator(z3::expr org_expr, z3::expr, z3::expr);
     bool Z3SolveConcritize(std::vector<VMState::SYMemObject*> symobjs,  std::set<KVExprPtr> constraints);
+
+    // concritize function (to uint64_t constant)
+    uint64_t Z3ExpressionEvaluatorToConstant(z3::expr org_expr, z3::expr, z3::expr);
+    uint64_t Z3SolveConcritizeToConstant(std::vector<VMState::SYMemObject*> symobjs,  std::set<KVExprPtr> constraints);
 
     z3::expr Z3HandlingExprPtr(ExprPtr ptr);
 
