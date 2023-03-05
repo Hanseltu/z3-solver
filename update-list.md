@@ -61,3 +61,13 @@
 #### 20221121
 *  Fix the issue of "Assertion `a.is_bool() && b.is_bool()' failed"
    * replace the implementation of function [`Z3Handler::Z3HandleSign`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L713) and [`Z3Handler::Z3HandleNoSign`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L727) in `Z3Handler.cpp`
+
+#### 20230306
+
+* Fix the `SignExt` and `ZeroExt` issues: the size to be extended should be dynamically decided
+   * Step 1: Replace the implementation of the function body of the function [`Z3Handler::Z3HandleSignExt`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L863) and [`Z3Handler::Z3HandleZeroEXT`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L878) in `Z3Handler.cpp`.
+   * Step 2: add the new assignment of the size for `SignExt` and `ZeroExt` in `Expr.h` in [Line 410](https://github.com/Hanseltu/z3-solver/blob/main/Expr.h#L410) and [Line 424](https://github.com/Hanseltu/z3-solver/blob/main/Expr.h#L424).
+
+* Add the implementation of concretization to a constant (uint64_t) value rather than a bool value
+   * add the impelmentation of two new functions [`Z3Handler::Z3ExpressionEvaluatorToConstant`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L99) and [`Z3Handler::Z3SolveConcritizeToConstant`](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.cpp#L268) in `Z3Handler.cpp`.
+   * add the new function defintions in `Z3Handler.h` in [Line 42](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.h#L42) and [Line 43](https://github.com/Hanseltu/z3-solver/blob/main/Z3Handler.h#L43).
