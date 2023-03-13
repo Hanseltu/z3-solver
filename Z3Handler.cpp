@@ -286,10 +286,19 @@ uint64_t Z3Handler::Z3SolveConcritizeToConstant(std::vector<VMState::SYMemObject
     std::cout << "exprs : " << exprs << std::endl;
     // Filter the symbolic variables that are not marked with seed
     std::vector<VMState::SYMemObject*> symobjs; // symbolic variables in the seed mode
+
+    // Only add the symbols in the constraints
+    for (auto it = symObjectsMap.begin(); it != symObjectsMap.end(); it++) {
+        // std::cout << it->first << ": " << it->second << std::endl;
+        if (it->first->has_seed == true)
+            symobjs.push_back(it->first);
+    }
+    /*
     for (auto symobj : symobjs_all) {
         if (symobj->has_seed == true)
             symobjs.push_back(symobj);
     }
+    */
     /*
     if (symobjs.size() != symObjectsMap.size()){
         // TODO for further use of the constraints: e.g., partially concritiize the symbolic variables
