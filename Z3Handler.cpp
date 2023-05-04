@@ -71,6 +71,42 @@ std::map<std::string, unsigned long long> Z3Handler::Z3SolveOne(std::set<KVExprP
     return ret;
 }
 
+
+bool Z3Handler::Z3ConstraintChecking(std::set<KVExprPtr> constraints){
+    bool ret = 0;
+    g_solver.reset();
+    auto firstExpr = constraints.begin();
+    expr exprs = Z3HandlingExprPtr(*firstExpr);
+    // start from second constraints and combine all constraints together
+    auto it = constraints.begin();
+    it++;
+    for (; it != constraints.end(); it++){
+        exprs = exprs & Z3HandlingExprPtr(*it);
+    }
+    g_solver.add(exprs);
+    //std::cout << "solver: " << g_solver <<  std::endl;
+    // produce .smt2 file which can be used in other solvers
+    //std::cout << "smt2 :" << g_solver.to_smt2() << "\n done" << std::endl;
+    switch (g_solver.check()){
+        case sat: {
+                    std::cout << "@@@ SAT" << std::endl;
+                    ret = 1;
+                    break;
+                }
+        case unsat:{
+                    std::cout << "@@@ UNSAT" << std::endl;
+                    ret = 0;
+                    break;
+                }
+        case unknown:{
+                    std::cout << "@@@ UNKNOWN" << std::endl;
+                    ret = 0;
+                    break;
+                }
+    }
+    return ret;
+}
+
 /*
  * Function: check whether a constraint (expression) can be true when concritizing a single symbolic variable using Z3 expr
  * Input: 1) expr to be checked; 2) symbolic expr; 3) concrete expr to be substituted for symbolic expr

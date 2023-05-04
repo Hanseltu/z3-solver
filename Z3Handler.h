@@ -29,6 +29,8 @@ public:
     Z3Handler();
     virtual ~Z3Handler();
 
+    //checking only function
+    bool Z3ConstraintChecking(std::set<KVExprPtr> constraints);
     // a set to store symbolic objects
     std::map<VMState::SYMemObject*, z3::expr> symObjectsMap;
     // solver function

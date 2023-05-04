@@ -250,8 +250,8 @@ void test(){
     std::set<KVExprPtr> constraints_test;
     //constraints_test.insert(sub_expr_test);
     //constraints_test.insert(add_expr);
-    //constraints_test.insert(dist_expr_test);
-    constraints_test.insert(and_expr_test);
+    constraints_test.insert(dist_expr_test);
+    //constraints_test.insert(and_expr_test);
     //constraints_test.insert(sign_expr_test);
     //constraints_test.insert(nosign_expr_test);
     //constraints_test.insert(lnot_expr1);
@@ -285,6 +285,8 @@ void test(){
     //symobjts.push_back(obj); // testing a symbolic object which is not in the constraints
     //values.push_back(1000);
     //unsigned long long time_start_concritize = rdtsc();
+    bool checking_ret = z3_handler_test->Z3ConstraintChecking(constraints_test);
+    std::cout << "checking_ret : " << checking_ret << std::endl;
     bool ret_bool = z3_handler_test->Z3SolveConcritize(symobjts, constraints_test);
     int64_t ret_con = z3_handler_test->Z3SolveConcritizeToConstant(symobjts, constraints_test);
     std::cout << "result of concritize (to bool): " << ret_bool << std::endl;
